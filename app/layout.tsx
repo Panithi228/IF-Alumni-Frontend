@@ -27,7 +27,22 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {/* Header */}
+        <header>
+          <div className="bg-gray-800 text-white p-4 shadow-md">
+            <h1 className="text-2xl font-bold">IF-Alumni</h1>
+          </div>
+        </header>
+
+        {/* content */}
+        {children}
+
+        {/* Footer */}
+        <footer className="bg-gray-800 text-white p-4 mt-auto text-center">
+          <p>Just in case we need to use footer.</p>
+        </footer>
+      </body>
     </html>
   );
 }
