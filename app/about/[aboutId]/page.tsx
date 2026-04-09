@@ -7,8 +7,8 @@ export default function AboutId({ params }: { params: Promise<{ aboutId: string 
     const aboutId = resolvedParams.aboutId;
     
     useEffect(() => {
-        console.log("This is params: ", params);
-    }, [params]);
+        console.log("This is params: ", resolvedParams);
+    }, [resolvedParams]);
     
   return (
     <h1>This is About Page with ID: {aboutId} 😀</h1>

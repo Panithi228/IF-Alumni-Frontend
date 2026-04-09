@@ -1,4 +1,3 @@
-import Header from "./components/Header";
 import PostLists from "./components/post/postLists";
 
 export default function Home() {

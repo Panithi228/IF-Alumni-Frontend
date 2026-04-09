@@ -1,86 +1,214 @@
 'use client'
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Swal from 'sweetalert2';
 
-const EditPostModal = ({ handleCloseEvent }: { handleCloseEvent: () => void }) => {
-    const [title, setTitle] = useState('');
-    const [status, setStatus] = useState('');
+type Props = {
+    postId: number | null;
+    handleCloseEvent: () => void;
+    fetchDataEvent: () => void;
+};
+
+const EditPostModal = ({ postId, handleCloseEvent, fetchDataEvent }: Props) => {
+    const [fullName, setFullName] = useState('');
+    const [studentId, setStudentId] = useState('');
+    const [major, setMajor] = useState('');
+    const [graduationYear, setGraduationYear] = useState('');
+    const [email, setEmail] = useState('');
+    const [jobPosition, setJobPosition] = useState('');
+    const [workplace, setWorkplace] = useState('');
+    const [additionalInfo, setAdditionalInfo] = useState('');
+    const [status, setStatus] = useState('publish');
     const [featuredImage, setFeaturedImage] = useState<File | null>(null);
+    const [currentImageUrl, setCurrentImageUrl] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isLoadingData, setIsLoadingData] = useState(true);
+
+    useEffect(() => {
+        const fetchCurrentPost = async () => {
+            if (!postId) return;
+            try {
+                const response = await fetch(`http://localhost:8000/wp-json/wp/v2/alumni/${postId}?_embed`, {
+                    headers: {
+                        'Authorization': 'Basic ' + btoa('admin:admin')
+                    }
+                });
+                const data = await response.json();
+
+                setFullName(data.title.rendered || '');
+                setStatus(data.status);
+                if (data.acf) {
+                    setStudentId(data.acf.student_id || '');
+                    setMajor(data.acf.major || '');
+                    setGraduationYear(data.acf.graduation_year || '');
+                    setEmail(data.acf.email || '');
+                    setJobPosition(data.acf.job_position || '');
+                    setWorkplace(data.acf.workplace || '');
+                    setAdditionalInfo(data.acf.additional_info || '');
+                }
+                // รูปเดิม
+                if (data._embedded && data._embedded['wp:featuredmedia']) {
+                    setCurrentImageUrl(data._embedded['wp:featuredmedia'][0].source_url);
+                }
+            } catch (error) {
+                console.error("Error fetching post:", error);
+                Swal.fire('Error', 'ไม่สามารถโหลดข้อมูลได้', 'error');
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+
+        fetchCurrentPost();
+    }, [postId]);
+
+    const handleImageUpload = async (image: File) => {
+        const formData = new FormData();
+        formData.append('file', image);
+        const response = await fetch('http://localhost:8000/wp-json/wp/v2/media', {
+            method: 'POST',
+            headers: { 'Authorization': 'Basic ' + btoa('admin:admin') },
+            body: formData
+        });
+        const data = await response.json();
+        return data.id;
+    };
 
     //Handle form submission
-    const handleformSubmit = (event: { preventDefault: () => void; }) => {
+    const handleFormSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+        if (isSubmitting) return;
 
-        const postData = {
-            title: title,
-            status: status,
-            featured_Image: featuredImage
+        setIsSubmitting(true);
+        Swal.fire({ title: 'กำลังบันทึก...', didOpen: () => Swal.showLoading() });
+
+        try {
+            let featuredImageID = undefined;
+
+            if (featuredImage) {
+                featuredImageID = await handleImageUpload(featuredImage);
+            }
+
+            const postData = {
+                title: fullName,
+                status: status,
+                featured_media: featuredImageID,
+                acf: {
+                    full_name: fullName,
+                    student_id: studentId,
+                    major: major,
+                    graduation_year: graduationYear,
+                    email: email,
+                    job_position: jobPosition,
+                    workplace: workplace,
+                    additional_info: additionalInfo
+                }
+            };
+
+            const response = await fetch(`http://localhost:8000/wp-json/wp/v2/alumni/${postId}`, {
+                method: 'POST', 
+                headers: {
+                    'Authorization': 'Basic ' + btoa('admin:admin'),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postData)
+            });
+
+            if (response.ok) {
+                await Swal.fire({ icon: 'success', title: 'อัปเดตข้อมูลเรียบร้อย', showConfirmButton: false, timer: 1500 });
+                fetchDataEvent();
+                handleCloseEvent();
+            }
+        } catch (error) {
+            console.error('Error updating:', error);
+            Swal.fire('Error', 'การอัปเดตล้มเหลว', 'error');
+        } finally {
+            setIsSubmitting(false);
         }
-        
-        console.log(postData);
-    }
+    };
+
+    if (isLoadingData) return null;
 
     return (
-        <>
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800/50">
-                <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
-                    <h2 className="text-2xl mb-4">Edit Alumni</h2>
-
-                    <form onSubmit={handleformSubmit}>
-                        <div className="grid grid-cols-2 gap-4">
-                            
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-2">Title</label>
-                                <input 
-                                    type="text" 
-                                    className="border border-gray-300 rounded w-full p-2"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    required
-                                />
-                            </div>
-
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-2">Status</label>
-                                <select 
-                                    className="border border-gray-300 rounded w-full p-2"
-                                    value={status}
-                                    onChange={(e) => setStatus(e.target.value)}
-                                    required
-                                >
-                                    <option value="" hidden>Select Status</option>
-                                    <option value="publish">Publish</option>
-                                    <option value="draft">Draft</option>
-                                </select>
-                            </div>
-
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-2">Featured Image</label>
-                                <input type="file" onChange={(e) => setFeaturedImage(e.target.files ? e.target.files[0] : null)} />
-                            </div>
-                        </div>
-
-                        <div className="flex justify-end mt-4">
-                            <button 
-                                type="button"
-                                className="bg-gray-500 text-white px-4 py-2 rounded mr-2 cursor-pointer"
-                                onClick={handleCloseEvent}
-                            >
-                                Cancel
-                            </button>
-
-                            <button 
-                                type="submit"
-                                className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer"
-                            >
-                                Update
-                            </button>
-                        </div>
-                    </form>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800/60 backdrop-blur-sm p-4">
+            <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-gray-800">Edit Alumni Information</h2>
+                    <span className="text-xs font-mono text-gray-400">ID: #{postId}</span>
                 </div>
+
+                <form onSubmit={handleFormSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-semibold mb-1">Full Name</label>
+                            <input type="text" className="border rounded-lg w-full p-2" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold mb-1">Student ID</label>
+                            <input type="text" className="border rounded-lg w-full p-2" value={studentId} onChange={(e) => setStudentId(e.target.value)} />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold mb-1">Major</label>
+                            <input type="text" className="border rounded-lg w-full p-2" value={major} onChange={(e) => setMajor(e.target.value)} />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold mb-1">Graduation Year</label>
+                            <input type="text" className="border rounded-lg w-full p-2" value={graduationYear} onChange={(e) => setGraduationYear(e.target.value)} />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold mb-1">Email</label>
+                            <input type="email" className="border rounded-lg w-full p-2" value={email} onChange={(e) => setEmail(e.target.value)} />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold mb-1">Job Position</label>
+                            <input type="text" className="border rounded-lg w-full p-2" value={jobPosition} onChange={(e) => setJobPosition(e.target.value)} />
+                        </div>
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-semibold mb-1">Workplace</label>
+                            <input type="text" className="border rounded-lg w-full p-2" value={workplace} onChange={(e) => setWorkplace(e.target.value)} />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold mb-1">Additional Information</label>
+                        <textarea className="border rounded-lg w-full p-2 h-24" value={additionalInfo} onChange={(e) => setAdditionalInfo(e.target.value)}></textarea>
+                    </div>
+
+                    <div className="border-t pt-4">
+                        <label className="block text-sm font-semibold mb-2">Featured Image</label>
+                        <div className="flex items-center gap-4">
+                            {currentImageUrl && !featuredImage && (
+                                <img src={currentImageUrl} alt="Current" className="w-16 h-16 object-cover rounded-lg border" />
+                            )}
+                            <input 
+                                type="file" 
+                                className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                                onChange={(e) => setFeaturedImage(e.target.files ? e.target.files[0] : null)}  
+                            />
+                        </div>
+                        <p className="text-[10px] text-gray-400 mt-1">*เลือกไฟล์ใหม่หากต้องการเปลี่ยนรูปภาพ</p>
+                    </div>
+
+                    <div className="flex justify-end mt-6 gap-3">
+                        <button 
+                            type="button"
+                            className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer"
+                            onClick={handleCloseEvent}
+                            disabled={isSubmitting}
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            type="submit"
+                            className={`px-6 py-2 rounded-lg text-white font-semibold transition-all ${isSubmitting ? 'bg-indigo-300' : 'bg-indigo-600 hover:bg-indigo-700'} cursor-pointer`}
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? 'Updating...' : 'Update Alumni'}
+                        </button>
+                    </div>
+                </form>
             </div>
-        </>
-    )
+        </div>
+    );
 }
 
 export default EditPostModal;
