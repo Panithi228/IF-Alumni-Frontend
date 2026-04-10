@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Swal from 'sweetalert2';
-import Papa from 'papaparse'; 
 import * as XLSX from 'xlsx';
 
 type Props = {
@@ -42,7 +41,7 @@ const AddPostModal = ({ handleCloseEvent, fetchDataEvent }: Props) => {
             
             const postData = {
                 title: fullName,
-                status: 'draft',
+                status: 'pending',
                 featured_media: featuredImageID,
                 acf: {
                     full_name: fullName,
@@ -62,7 +61,7 @@ const AddPostModal = ({ handleCloseEvent, fetchDataEvent }: Props) => {
                 const response = await fetch('http://localhost:8000/wp-json/wp/v2/alumni', {
                     'method': 'POST',
                     'headers': {
-                        'Authorization': 'Basic ' + btoa('admin:admin'),
+                        'Authorization': 'Bearer ' + window.localStorage.getItem('jwtToken'),
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(postData)
@@ -116,7 +115,7 @@ const AddPostModal = ({ handleCloseEvent, fetchDataEvent }: Props) => {
                     const response = await fetch('http://localhost:8000/wp-json/wp/v2/alumni', {
                         method: 'POST',
                         headers: {
-                            'Authorization': 'Basic ' + btoa('admin:admin'),
+                            'Authorization': 'Bearer ' + window.localStorage.getItem('jwtToken'),
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
@@ -172,7 +171,7 @@ const AddPostModal = ({ handleCloseEvent, fetchDataEvent }: Props) => {
             const response = await fetch('http://localhost:8000/wp-json/wp/v2/media', {
                 'method': 'POST',
                 'headers': {
-                    'Authorization': 'Basic ' + btoa('admin:admin'),
+                    'Authorization': 'Bearer ' + window.localStorage.getItem('jwtToken'),
                 },
                 body: formData
             });

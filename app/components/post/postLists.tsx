@@ -7,16 +7,19 @@ import EditPostModal from "./Modal/editPostModal";
 import Notification from "../notification";
 import Swal from 'sweetalert2';
 
-const PostLists = () => {
+type Props = {
+    token: string | null;
+};
+
+const PostLists = ({token}: Props) => {
     const [addPostModalOpen, setAddPostModalOpen] = useState(false);
     const [editPostModalOpen, setEditPostModalOpen] = useState(false);
     const [selectedPostId, setSelectedPostId] = useState(null); 
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isNotiModalOpen, setIsNotiModalOpen] = useState(false);
-    const publishedAlumni = posts.filter(post => post.status === 'publish');
-    const draftAlumni = posts.filter(post => post.status === 'draft');
-    const [token, setToken] = useState<string | null>(null);
+    const publishedAlumni = posts.filter(post => post.status === 'publish' || post.status === 'draft');
+    const draftAlumni = posts.filter(post => post.status === 'pending');
 
     const DEFAULT_IMAGE = 'http://localhost:8000/wp-content/uploads/2026/04/user-icon-fake-photo-sign-profile-button-simple-style-social-media-poster-background-symbol-user-brand-logo-design-element-user-t-shirt-printing-for-sticker-free-vector.jpg';
 
@@ -41,7 +44,7 @@ const PostLists = () => {
 
         try {
             const url = token
-                ? 'http://localhost:8000/wp-json/wp/v2/alumni?status=publish,draft&_embed'
+                ? 'http://localhost:8000/wp-json/wp/v2/alumni?status=publish,pending,draft&_embed'
                 : 'http://localhost:8000/wp-json/wp/v2/alumni?status=publish&_embed';
 
             const response = await fetch(url, {
@@ -116,6 +119,54 @@ const PostLists = () => {
             }
         }
     }
+
+    const handleHide = async (id: number) => {
+        const result = await Swal.fire({
+            title: 'ยืนยันการซ่อน?',
+            text: "รายการนี้จะถูกเปลี่ยนเป็นฉบับร่าง (Draft)",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'ใช่, ซ่อนเลย!',
+            cancelButtonText: 'ยกเลิก'
+        });
+
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'กำลังดำเนินการ...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading(); 
+                }
+            });
+
+            try {
+                const response = await fetch(`http://localhost:8000/wp-json/wp/v2/alumni/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + window.localStorage.getItem('jwtToken')
+                    },
+                    body: JSON.stringify({ status: 'draft' })
+                });
+
+                if (response.ok) {
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'ซ่อนเรียบร้อย!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    fetchPosts();
+                } else {
+                    throw new Error('Server response was not ok');
+                }
+            } catch (error) {
+                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถซ่อนได้ในขณะนี้', 'error');
+            }
+        }
+    };
     
     // ฟังก์ชันสำหรับสร้าง JWT Token
     const generateJWTToken = async () => {
@@ -155,11 +206,6 @@ const PostLists = () => {
             console.log("Error validating JWT token:", error);
         }
     }
-    
-    useEffect(() => {
-        const storedToken = window.localStorage.getItem('jwtToken');
-        setToken(storedToken);
-    }, []);
 
     useEffect(() => {
         fetchPosts();
@@ -199,7 +245,7 @@ const PostLists = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                             </svg>
                             
-                            {/* Badge ตัวเลขสีแดง (จะแสดงเฉพาะเมื่อมี Draft) */}
+                            {/* Badge ตัวเลขสีแดง (จะแสดงเฉพาะเมื่อมี Pending) */}
                             {draftAlumni.length > 0 && (
                                 <span className="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white animate-bounce">
                                     {draftAlumni.length}
@@ -239,7 +285,6 @@ const PostLists = () => {
                                     </h3>
                                 </Link>
                                 
-                                {/* แสดงข้อมูล ACF เบื้องต้น (ถ้ามี) */}
                                 {post.acf?.major && (
                                     <p className="text-sm text-indigo-600 font-medium mb-1">{post.acf.major}</p>
                                 )}
@@ -257,7 +302,7 @@ const PostLists = () => {
                                     {token && (
                                         <button 
                                             className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 text-sm font-semibold py-2 rounded-lg transition-colors border border-red-200 cursor-pointer"
-                                            onClick={() => {/* เพิ่ม logic ลบตรงนี้ */}}
+                                            onClick={() => handleHide(post.id)}
                                         >
                                             Hide
                                         </button>

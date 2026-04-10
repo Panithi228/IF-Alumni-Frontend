@@ -23,20 +23,23 @@ const EditPostModal = ({ postId, handleCloseEvent, fetchDataEvent }: Props) => {
     const [currentImageUrl, setCurrentImageUrl] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoadingData, setIsLoadingData] = useState(true);
+    const [originalStudentId, setOriginalStudentId] = useState('');
+    const [originalEmail, setOriginalEmail] = useState('');
 
     useEffect(() => {
         const fetchCurrentPost = async () => {
             if (!postId) return;
             try {
-                const response = await fetch(`http://localhost:8000/wp-json/wp/v2/alumni/${postId}?_embed`, {
-                    headers: {
-                        'Authorization': 'Basic ' + btoa('admin:admin')
-                    }
-                });
+                const token = window.localStorage.getItem('jwtToken');
+                const headers: Record<string, string> = {};
+                if (token) headers['Authorization'] = 'Bearer ' + token;
+
+                const response = await fetch(`http://localhost:8000/wp-json/wp/v2/alumni/${postId}?_embed`, { headers });
                 const data = await response.json();
 
                 setFullName(data.title.rendered || '');
                 setStatus(data.status);
+
                 if (data.acf) {
                     setStudentId(data.acf.student_id || '');
                     setMajor(data.acf.major || '');
@@ -45,8 +48,10 @@ const EditPostModal = ({ postId, handleCloseEvent, fetchDataEvent }: Props) => {
                     setJobPosition(data.acf.job_position || '');
                     setWorkplace(data.acf.workplace || '');
                     setAdditionalInfo(data.acf.additional_info || '');
+                    setOriginalStudentId(data.acf.student_id || '');
+                    setOriginalEmail(data.acf.email || '');
                 }
-                // รูปเดิม
+
                 if (data._embedded && data._embedded['wp:featuredmedia']) {
                     setCurrentImageUrl(data._embedded['wp:featuredmedia'][0].source_url);
                 }
@@ -66,7 +71,9 @@ const EditPostModal = ({ postId, handleCloseEvent, fetchDataEvent }: Props) => {
         formData.append('file', image);
         const response = await fetch('http://localhost:8000/wp-json/wp/v2/media', {
             method: 'POST',
-            headers: { 'Authorization': 'Basic ' + btoa('admin:admin') },
+            headers: { 
+                'Authorization': 'Bearer ' + window.localStorage.getItem('jwtToken')
+            },
             body: formData
         });
         const data = await response.json();
@@ -78,12 +85,20 @@ const EditPostModal = ({ postId, handleCloseEvent, fetchDataEvent }: Props) => {
         event.preventDefault();
         if (isSubmitting) return;
 
+        const token = window.localStorage.getItem('jwtToken');
+
+        if (!token) {
+            if (studentId !== originalStudentId || email !== originalEmail) {
+                await Swal.fire('Error', 'Student ID หรือ Email ไม่ถูกต้อง', 'error');
+                return;
+            }
+        }
+
         setIsSubmitting(true);
         Swal.fire({ title: 'กำลังบันทึก...', didOpen: () => Swal.showLoading() });
 
         try {
             let featuredImageID = undefined;
-
             if (featuredImage) {
                 featuredImageID = await handleImageUpload(featuredImage);
             }
@@ -94,10 +109,10 @@ const EditPostModal = ({ postId, handleCloseEvent, fetchDataEvent }: Props) => {
                 featured_media: featuredImageID,
                 acf: {
                     full_name: fullName,
-                    student_id: studentId,
+                    student_id: originalStudentId,
                     major: major,
                     graduation_year: graduationYear,
-                    email: email,
+                    email: originalEmail,
                     job_position: jobPosition,
                     workplace: workplace,
                     additional_info: additionalInfo
@@ -107,7 +122,7 @@ const EditPostModal = ({ postId, handleCloseEvent, fetchDataEvent }: Props) => {
             const response = await fetch(`http://localhost:8000/wp-json/wp/v2/alumni/${postId}`, {
                 method: 'POST', 
                 headers: {
-                    'Authorization': 'Basic ' + btoa('admin:admin'),
+                    'Authorization': 'Bearer ' + (token || ''),
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(postData)
@@ -123,6 +138,7 @@ const EditPostModal = ({ postId, handleCloseEvent, fetchDataEvent }: Props) => {
             Swal.fire('Error', 'การอัปเดตล้มเหลว', 'error');
         } finally {
             setIsSubmitting(false);
+            Swal.close();
         }
     };
 
@@ -144,7 +160,7 @@ const EditPostModal = ({ postId, handleCloseEvent, fetchDataEvent }: Props) => {
                         </div>
                         <div>
                             <label className="block text-sm font-semibold mb-1">Student ID</label>
-                            <input type="text" className="border rounded-lg w-full p-2" value={studentId} onChange={(e) => setStudentId(e.target.value)} />
+                            <input required type="text" className="border rounded-lg w-full p-2" value={studentId} onChange={(e) => setStudentId(e.target.value)} />
                         </div>
                         <div>
                             <label className="block text-sm font-semibold mb-1">Major</label>
@@ -156,7 +172,7 @@ const EditPostModal = ({ postId, handleCloseEvent, fetchDataEvent }: Props) => {
                         </div>
                         <div>
                             <label className="block text-sm font-semibold mb-1">Email</label>
-                            <input type="email" className="border rounded-lg w-full p-2" value={email} onChange={(e) => setEmail(e.target.value)} />
+                            <input required type="email" className="border rounded-lg w-full p-2" value={email} onChange={(e) => setEmail(e.target.value)} />
                         </div>
                         <div>
                             <label className="block text-sm font-semibold mb-1">Job Position</label>
