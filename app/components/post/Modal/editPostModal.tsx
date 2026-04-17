@@ -26,6 +26,8 @@ const EditPostModal = ({ postId, handleCloseEvent, fetchDataEvent }: Props) => {
     const [originalStudentId, setOriginalStudentId] = useState('');
     const [originalEmail, setOriginalEmail] = useState('');
 
+    const API_BASE_URL = 'http://localhost:8000/wp-json';
+
     useEffect(() => {
         const fetchCurrentPost = async () => {
             if (!postId) return;
@@ -41,15 +43,18 @@ const EditPostModal = ({ postId, handleCloseEvent, fetchDataEvent }: Props) => {
                 setStatus(data.status);
 
                 if (data.acf) {
-                    setStudentId(data.acf.student_id || '');
                     setMajor(data.acf.major || '');
                     setGraduationYear(data.acf.graduation_year || '');
-                    setEmail(data.acf.email || '');
                     setJobPosition(data.acf.job_position || '');
                     setWorkplace(data.acf.workplace || '');
                     setAdditionalInfo(data.acf.additional_info || '');
                     setOriginalStudentId(data.acf.student_id || '');
                     setOriginalEmail(data.acf.email || '');
+                }
+                
+                if (data.acf && token) {
+                    setStudentId(data.acf.student_id || '');
+                    setEmail(data.acf.email || '');
                 }
 
                 if (data._embedded && data._embedded['wp:featuredmedia']) {
@@ -85,60 +90,50 @@ const EditPostModal = ({ postId, handleCloseEvent, fetchDataEvent }: Props) => {
         event.preventDefault();
         if (isSubmitting) return;
 
-        const token = window.localStorage.getItem('jwtToken');
-
-        if (!token) {
-            if (studentId !== originalStudentId || email !== originalEmail) {
-                await Swal.fire('Error', 'Student ID หรือ Email ไม่ถูกต้อง', 'error');
-                return;
-            }
-        }
-
         setIsSubmitting(true);
         Swal.fire({ title: 'กำลังบันทึก...', didOpen: () => Swal.showLoading() });
 
         try {
-            let featuredImageID = undefined;
+            const formData = new FormData();
+            const token = window.localStorage.getItem('jwtToken');
+
+            formData.append('title', fullName);
+            
+            formData.append('check_student_id', studentId); 
+            formData.append('check_email', email);
+
             if (featuredImage) {
-                featuredImageID = await handleImageUpload(featuredImage);
+                formData.append('featured_image', featuredImage);
             }
 
-            const postData = {
-                title: fullName,
-                status: status,
-                featured_media: featuredImageID,
-                acf: {
-                    full_name: fullName,
-                    student_id: originalStudentId,
-                    major: major,
-                    graduation_year: graduationYear,
-                    email: originalEmail,
-                    job_position: jobPosition,
-                    workplace: workplace,
-                    additional_info: additionalInfo
-                }
-            };
+            formData.append('acf[full_name]', fullName);
+            formData.append('acf[major]', major);
+            formData.append('acf[graduation_year]', graduationYear);
+            formData.append('acf[job_position]', jobPosition);
+            formData.append('acf[workplace]', workplace);
+            formData.append('acf[additional_info]', additionalInfo);
 
-            const response = await fetch(`http://localhost:8000/wp-json/wp/v2/alumni/${postId}`, {
-                method: 'POST', 
-                headers: {
-                    'Authorization': 'Bearer ' + (token || ''),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(postData)
+            const url = `${API_BASE_URL}/alumni-api/v1/update/${postId}`;
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: token ? { 'Authorization': 'Bearer ' + token } : {},
+                body: formData
             });
 
+            const result = await response.json();
+
             if (response.ok) {
-                await Swal.fire({ icon: 'success', title: 'อัปเดตข้อมูลเรียบร้อย', showConfirmButton: false, timer: 1500 });
+                await Swal.fire({ icon: 'success', title: 'อัปเดตเรียบร้อย', text: 'กรุณารอข้อมูลอัปเดตสักครู่' });
                 fetchDataEvent();
                 handleCloseEvent();
+            } else {
+                throw new Error(result.message || 'ข้อมูลยืนยันไม่ถูกต้อง');
             }
-        } catch (error) {
-            console.error('Error updating:', error);
-            Swal.fire('Error', 'การอัปเดตล้มเหลว', 'error');
+        } catch (error: any) {
+            Swal.fire('Error', error.message, 'error');
         } finally {
             setIsSubmitting(false);
-            Swal.close();
         }
     };
 
@@ -155,42 +150,52 @@ const EditPostModal = ({ postId, handleCloseEvent, fetchDataEvent }: Props) => {
                 <form onSubmit={handleFormSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-semibold mb-1">Full Name</label>
+                            <label className="block text-sm font-semibold mb-1">ชื่อ - นามสกุล</label>
                             <input type="text" className="border rounded-lg w-full p-2" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold mb-1">Student ID</label>
+                            <label className="block text-sm font-semibold mb-1">รหัสนิสิต</label>
                             <input required type="text" className="border rounded-lg w-full p-2" value={studentId} onChange={(e) => setStudentId(e.target.value)} />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold mb-1">Major</label>
-                            <input type="text" className="border rounded-lg w-full p-2" value={major} onChange={(e) => setMajor(e.target.value)} />
+                            <label className="block text-sm font-semibold mb-1">สาขาวิชา</label>
+                            <select 
+                                className="border rounded-lg w-full p-2 bg-white" 
+                                value={major} 
+                                onChange={(e) => setMajor(e.target.value)}
+                            >
+                                <option value="" disabled hidden>เลือกสาขาวิชา</option>
+                                <option value="CS">สาขาวิชาวิทยาการคอมพิวเตอร์</option>
+                                <option value="ITDI">สาขาวิชาเทคโนโลยีสารสนเทศเพื่ออุตสาหกรรมดิจิทัล</option>
+                                <option value="SE">สาขาวิชาวิศวกรรมซอฟต์แวร์</option>
+                                <option value="AAI">สาขาวิชาปัญญาประดิษฐ์ประยุกต์และเทคโนโลยีอัจฉริยะ</option>
+                            </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold mb-1">Graduation Year</label>
+                            <label className="block text-sm font-semibold mb-1">รุ่นปีการศึกษา</label>
                             <input type="text" className="border rounded-lg w-full p-2" value={graduationYear} onChange={(e) => setGraduationYear(e.target.value)} />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold mb-1">Email</label>
+                            <label className="block text-sm font-semibold mb-1">อีเมล</label>
                             <input required type="email" className="border rounded-lg w-full p-2" value={email} onChange={(e) => setEmail(e.target.value)} />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold mb-1">Job Position</label>
+                            <label className="block text-sm font-semibold mb-1">ตำแหน่งงาน</label>
                             <input type="text" className="border rounded-lg w-full p-2" value={jobPosition} onChange={(e) => setJobPosition(e.target.value)} />
                         </div>
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-semibold mb-1">Workplace</label>
+                            <label className="block text-sm font-semibold mb-1">สถานที่ทำงาน</label>
                             <input type="text" className="border rounded-lg w-full p-2" value={workplace} onChange={(e) => setWorkplace(e.target.value)} />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-semibold mb-1">Additional Information</label>
+                        <label className="block text-sm font-semibold mb-1">ข้อมูลเพิ่มเติม</label>
                         <textarea className="border rounded-lg w-full p-2 h-24" value={additionalInfo} onChange={(e) => setAdditionalInfo(e.target.value)}></textarea>
                     </div>
 
                     <div className="border-t pt-4">
-                        <label className="block text-sm font-semibold mb-2">Featured Image</label>
+                        <label className="block text-sm font-semibold mb-2">รูปถ่ายของท่าน</label>
                         <div className="flex items-center gap-4">
                             {currentImageUrl && !featuredImage && (
                                 <img src={currentImageUrl} alt="Current" className="w-16 h-16 object-cover rounded-lg border" />

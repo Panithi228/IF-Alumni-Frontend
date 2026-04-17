@@ -20,6 +20,9 @@ const PostLists = ({token}: Props) => {
     const [isNotiModalOpen, setIsNotiModalOpen] = useState(false);
     const publishedAlumni = posts.filter(post => post.status === 'publish' || post.status === 'draft');
     const draftAlumni = posts.filter(post => post.status === 'pending');
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
 
     const DEFAULT_IMAGE = 'http://localhost:8000/wp-content/uploads/2026/04/user-icon-fake-photo-sign-profile-button-simple-style-social-media-poster-background-symbol-user-brand-logo-design-element-user-t-shirt-printing-for-sticker-free-vector.jpg';
 
@@ -38,29 +41,41 @@ const PostLists = ({token}: Props) => {
         }
     }
 
+    const MAJOR_MAP: Record<string, string> = {
+        'CS': 'สาขาวิชาวิทยาการคอมพิวเตอร์',
+        'ITDI': 'สาขาวิชาเทคโนโลยีสารสนเทศเพื่ออุตสาหกรรมดิจิทัล',
+        'SE': 'สาขาวิชาวิศวกรรมซอฟต์แวร์',
+        'AAI': 'สาขาวิชาปัญญาประดิษฐ์ประยุกต์และเทคโนโลยีอัจฉริยะ',
+    };
+
     // Fetch Alumni Lists
-    const fetchPosts = async () => {
-        setLoading(true);
+    const fetchPosts = async (pageNum = 1, reset = false) => {
+        if (pageNum === 1) setLoading(true);
+        else setLoadingMore(true);
+
+        const activeToken = token || window.localStorage.getItem('jwtToken');
 
         try {
-            const url = token
-                ? 'http://localhost:8000/wp-json/wp/v2/alumni?status=publish,pending,draft&_embed'
-                : 'http://localhost:8000/wp-json/wp/v2/alumni?status=publish&_embed';
+            const url = activeToken
+                ? `http://localhost:8000/wp-json/wp/v2/alumni?status=publish,pending,draft&per_page=100&page=${pageNum}&_embed`
+                : `http://localhost:8000/wp-json/wp/v2/alumni?status=publish&per_page=100&page=${pageNum}&_embed`;
 
             const response = await fetch(url, {
-                headers: token
-                    ? { Authorization: 'Bearer ' + token }
-                    : {}
+                headers: activeToken ? { Authorization: 'Bearer ' + activeToken } : {}
             });
 
+            const totalPages = Number(response.headers.get('X-WP-TotalPages'));
             const data = await response.json();
 
-            setPosts(Array.isArray(data) ? data : []);
+            setPosts(prev => reset || pageNum === 1 ? data : [...prev, ...data]);
+            setHasMore(pageNum < totalPages);
+            setPage(pageNum);
         } catch (error) {
             console.error(error);
-            setPosts([]);
+            if (pageNum === 1) setPosts([]);
         } finally {
             setLoading(false);
+            setLoadingMore(false);
         }
     };
 
@@ -167,6 +182,54 @@ const PostLists = ({token}: Props) => {
             }
         }
     };
+
+    const handleShow = async (id: number) => {
+        const result = await Swal.fire({
+            title: 'ยืนยันการแสดง?',
+            text: "รายการนี้จะถูกเผยแพร่ (Publish)",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#22c55e',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'ยืนยัน',
+            cancelButtonText: 'ยกเลิก'
+        });
+
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'กำลังดำเนินการ...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading(); 
+                }
+            });
+
+            try {
+                const response = await fetch(`http://localhost:8000/wp-json/wp/v2/alumni/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + window.localStorage.getItem('jwtToken')
+                    },
+                    body: JSON.stringify({ status: 'publish' })
+                });
+
+                if (response.ok) {
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'เผยแพร่เรียบร้อย!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    fetchPosts();
+                } else {
+                    throw new Error('Server response was not ok');
+                }
+            } catch (error) {
+                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถแสดงได้ในขณะนี้', 'error');
+            }
+        }
+    };
     
     // ฟังก์ชันสำหรับสร้าง JWT Token
     const generateJWTToken = async () => {
@@ -208,7 +271,7 @@ const PostLists = ({token}: Props) => {
     }
 
     useEffect(() => {
-        fetchPosts();
+        fetchPosts(1, true);
     }, [token]);
 
     return (
@@ -280,29 +343,46 @@ const PostLists = ({token}: Props) => {
                             {/* Content Area */}
                             <div className="p-5">
                                 <Link href={`/about/${post.id}`}>
-                                    <h3 className="text-lg font-bold text-gray-800 mb-1 hover:text-indigo-600 transition-colors" 
+                                    <h3 className="text-xl font-bold text-gray-800 mb-1 hover:text-indigo-600 transition-colors" 
                                         dangerouslySetInnerHTML={{ __html: post.title.rendered }}>
                                     </h3>
                                 </Link>
                                 
                                 {post.acf?.major && (
-                                    <p className="text-sm text-indigo-600 font-medium mb-1">{post.acf.major}</p>
+                                    <p className="text-sm text-indigo-600 font-medium mb-1">
+                                        {MAJOR_MAP[post.acf.major] || post.acf.major}
+                                    </p>
                                 )}
-                                <p className="text-xs text-gray-400 mb-4">Ref ID: #{post.id}</p>
+
+                                <p className="text-sm font-medium mb-4">{post.acf.job_position}</p>
                                 
                                 <div className="flex gap-2">
-                                    <button 
-                                        onClick={() => openEditPostModal(post.id)}
-                                        className="flex-1 bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-semibold py-2 rounded-lg transition-colors border border-amber-200 cursor-pointer"
-                                    >
-                                        Edit
-                                    </button>
+                                    {/* ปุ่ม Show จะแสดงก็ต่อเมื่อ login เท่านั้น */}
+                                    {token &&(
+                                         <button 
+                                            onClick={() => handleShow(post.id)}
+                                            disabled={post.status === 'publish'}
+                                            className={`flex-1 text-md font-semibold py-3 px-10 rounded-lg border transition
+                                            ${post.status === 'publish'
+                                                ? 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
+                                                : 'bg-green-100 hover:bg-green-200 text-green-700 border-green-400 cursor-pointer'
+                                            }`}
+                                        >
+                                            Show
+                                        </button>
+                                    )}
+                                   
 
                                     {/* ปุ่ม Hide จะแสดงก็ต่อเมื่อ login เท่านั้น */}
                                     {token && (
                                         <button 
-                                            className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 text-sm font-semibold py-2 rounded-lg transition-colors border border-red-200 cursor-pointer"
-                                            onClick={() => handleHide(post.id)}
+                                        onClick={() => handleHide(post.id)}
+                                        disabled={post.status === 'draft'}
+                                        className={`flex-1 text-md font-semibold py-3 px-10 rounded-lg border transition
+                                            ${post.status === 'draft'
+                                                ? 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed'
+                                                : 'bg-red-100 hover:bg-red-200 text-red-700 border-red-400 cursor-pointer'
+                                            }`}
                                         >
                                             Hide
                                         </button>
@@ -313,6 +393,23 @@ const PostLists = ({token}: Props) => {
                     )) : (
                         <div className="col-span-full text-center py-10 text-gray-500">
                             No alumni found.
+                        </div>
+                    )}
+
+                    {hasMore && (
+                        <div className="col-span-full flex justify-center mt-6">
+                            <button
+                                onClick={() => fetchPosts(page + 1)}
+                                disabled={loadingMore}
+                                className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-medium transition-all disabled:bg-gray-300 cursor-pointer"
+                            >
+                                {loadingMore ? (
+                                    <span className="flex items-center gap-2">
+                                        <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                                        กำลังโหลด...
+                                    </span>
+                                ) : 'โหลดเพิ่มเติม'}
+                            </button>
                         </div>
                     )}
                 </div>

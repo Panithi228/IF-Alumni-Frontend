@@ -24,60 +24,60 @@ const AddPostModal = ({ handleCloseEvent, fetchDataEvent }: Props) => {
     const [uploadFile, setUploadFile] = useState<File | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    //Handle form submission
-    const handleSingleSubmit = async (event: { preventDefault: () => void; }) => {
-        event.preventDefault();
+    const API_BASE_URL = 'http://localhost:8000/wp-json';
 
+    //Handle form submission
+    const handleSingleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
         if (isSubmitting) return;
         setIsSubmitting(true);
 
         try {
-            let featuredImageID = null;
-
-            // Upload the featured image if it exists
+            const formData = new FormData();
+            
+            formData.append('title', fullName);
+            
             if (featuredImage) {
-                featuredImageID = await handleFeaturedImageUpload(featuredImage);
+                formData.append('featured_image', featuredImage);
             }
-            
-            const postData = {
-                title: fullName,
-                status: 'pending',
-                featured_media: featuredImageID,
-                acf: {
-                    full_name: fullName,
-                    student_id: studentId,
-                    major: major,
-                    graduation_year: graduationYear,
-                    email: email,
-                    job_position: jobPosition,
-                    workplace: workplace,
-                    additional_info: additionalInfo
-                }
-            }
-            
-            console.log(postData);
 
-            try {
-                const response = await fetch('http://localhost:8000/wp-json/wp/v2/alumni', {
-                    'method': 'POST',
-                    'headers': {
-                        'Authorization': 'Bearer ' + window.localStorage.getItem('jwtToken'),
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(postData)
-                });
+            formData.append('acf[full_name]', fullName);
+            formData.append('acf[student_id]', studentId);
+            formData.append('acf[major]', major);
+            formData.append('acf[graduation_year]', graduationYear);
+            formData.append('acf[email]', email);
+            formData.append('acf[job_position]', jobPosition);
+            formData.append('acf[workplace]', workplace);
+            formData.append('acf[additional_info]', additionalInfo);
 
+            const token = localStorage.getItem('jwtToken');
+
+            const response = await fetch(`${API_BASE_URL}/alumni-api/v1/submit`, {
+                method: 'POST',
+                headers: token
+                ? { Authorization: `Bearer ${token}` }
+                : {},
+                body: formData
+            });
+
+            if (response.ok) {
                 const data = await response.json();
-                console.log('Post created successfully: ', data);
-                handleCloseEvent();
+                console.log('Successfully submitted:', data);
+                
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'ส่งข้อมูลสำเร็จ',
+                    text: 'ข้อมูลและรูปภาพของคุณถูกส่งเข้าระบบแล้ว กรุณารอแอดมินอนุมัติ',
+                });
                 fetchDataEvent();
-
-            } catch (error) {
-                console.log('Error creating post: ', error);
+                handleCloseEvent();
+            } else {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Submission failed');
             }
-            
-        } catch (error) {
-            console.log(error);
+        } catch (error: any) {
+            console.error('Error:', error);
+            Swal.fire('Error', error.message || 'ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง', 'error');
         } finally {
             setIsSubmitting(false);
         }
@@ -86,13 +86,13 @@ const AddPostModal = ({ handleCloseEvent, fetchDataEvent }: Props) => {
     const handleBulkSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!uploadFile) return Swal.fire('Error', 'กรุณาเลือกไฟล์', 'error');
-        
+
         setIsSubmitting(true);
-        Swal.fire({ 
-            title: 'กำลังอ่านไฟล์ Excel...', 
+        Swal.fire({
+            title: 'กำลังนำเข้าข้อมูล...',
             text: 'กรุณารอสักครู่',
             allowOutsideClick: false,
-            didOpen: () => Swal.showLoading() 
+            didOpen: () => Swal.showLoading()
         });
 
         try {
@@ -101,62 +101,80 @@ const AddPostModal = ({ handleCloseEvent, fetchDataEvent }: Props) => {
             const worksheet = workbook.Sheets[workbook.SheetNames[0]];
             const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-            if (jsonData.length === 0) {
-                throw new Error('ไม่พบข้อมูลในไฟล์ Excel');
-            }
-
             let successCount = 0;
             let errorCount = 0;
 
             for (const item of jsonData as any[]) {
-                if (!item.full_name) continue;
+            if (!item.full_name) continue;
 
-                try {
-                    const response = await fetch('http://localhost:8000/wp-json/wp/v2/alumni', {
+            try {
+                let featuredImageId = null;
+
+                if (item.image_url) {
+                    const imgRes = await fetch(item.image_url);
+                    const blob = await imgRes.blob();
+
+                    const formData = new FormData();
+                    formData.append('file', blob, `${item.full_name}.jpg`);
+                    formData.append('title', item.full_name);
+
+                    const mediaRes = await fetch(`${API_BASE_URL}/wp/v2/media`, {
                         method: 'POST',
                         headers: {
-                            'Authorization': 'Bearer ' + window.localStorage.getItem('jwtToken'),
-                            'Content-Type': 'application/json'
+                        Authorization: 'Bearer ' + window.localStorage.getItem('jwtToken')
                         },
-                        body: JSON.stringify({
-                            title: item.full_name,
-                            status: 'publish',
-                            featured_media: Number(item.profile_image) || null,
-                            acf: {
-                                full_name: item.full_name,
-                                student_id: item.student_id?.toString(),
-                                major: item.major,
-                                graduation_year: item.graduation_year?.toString(),
-                                email: item.email,
-                                job_position: item.job_position,
-                                workplace: item.workplace,
-                                additional_info: item.additional_info
-                            }
-                        })
+                        body: formData
                     });
 
-                    if (response.ok) successCount++;
-                    else errorCount++;
-
-                } catch (err) {
-                    console.error('Fetch error:', err);
-                    errorCount++;
+                    if (mediaRes.ok) {
+                        const mediaData = await mediaRes.json();
+                        featuredImageId = mediaData.id;
+                    }
                 }
-            }
 
-            setIsSubmitting(false);
-            Swal.fire({
-                icon: errorCount === 0 ? 'success' : 'warning',
-                title: 'นำเข้าข้อมูลเรียบร้อย',
-                text: `สำเร็จ ${successCount} รายการ, ล้มเหลว ${errorCount} รายการ`,
-            }).then(() => {
-                fetchDataEvent();
-                handleCloseEvent();
-            });
+                const postRes = await fetch(`${API_BASE_URL}/wp/v2/alumni`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + window.localStorage.getItem('jwtToken'),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: item.full_name,
+                        status: 'publish',
+                        featured_media: featuredImageId,
+                        acf: {
+                        full_name: item.full_name,
+                        student_id: item.student_id?.toString(),
+                        major: item.major,
+                        graduation_year: item.graduation_year?.toString(),
+                        email: item.email,
+                        job_position: item.job_position,
+                        workplace: item.workplace,
+                        additional_info: item.additional_info
+                        }
+                    })
+                });
+
+                if (postRes.ok) successCount++;
+                else errorCount++;
+
+            } catch (err) {
+                errorCount++;
+            }
+        }
+
+        setIsSubmitting(false);
+        Swal.fire({
+            icon: errorCount === 0 ? 'success' : 'warning',
+            title: 'นำเข้าข้อมูลเรียบร้อย',
+            text: `สำเร็จ ${successCount} รายการ, ล้มเหลว ${errorCount} รายการ`,
+        }).then(() => {
+            fetchDataEvent();
+            handleCloseEvent();
+        });
 
         } catch (error: any) {
-            console.error('Excel Error:', error);
-            Swal.fire('Error', error.message || 'ไม่สามารถอ่านไฟล์ Excel ได้', 'error');
+            Swal.fire('Error', 'ไม่สามารถอ่านไฟล์ได้', 'error');
             setIsSubmitting(false);
         }
     };
@@ -196,12 +214,15 @@ const AddPostModal = ({ handleCloseEvent, fetchDataEvent }: Props) => {
                         >
                             Single Entry
                         </button>
-                        <button 
-                            onClick={() => setActiveTab('bulk')}
-                            className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${activeTab === 'bulk' ? 'bg-white shadow text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
-                        >
-                            Bulk Upload (.csv)
-                        </button>
+
+                        {window.localStorage.getItem('jwtToken') && (
+                            <button 
+                                onClick={() => setActiveTab('bulk')}
+                                className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${activeTab === 'bulk' ? 'bg-white shadow text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                Bulk Upload (.csv)
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -211,42 +232,52 @@ const AddPostModal = ({ handleCloseEvent, fetchDataEvent }: Props) => {
                 <form onSubmit={handleSingleSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-semibold mb-1">Full Name</label>
+                            <label className="block text-sm font-semibold mb-1">ชื่อ - นามสกุล</label>
                             <input type="text" className="border rounded-lg w-full p-2" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold mb-1">Student ID</label>
+                            <label className="block text-sm font-semibold mb-1">รหัสนิสิต</label>
                             <input type="text" className="border rounded-lg w-full p-2" value={studentId} onChange={(e) => setStudentId(e.target.value)} />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold mb-1">Major</label>
-                            <input type="text" className="border rounded-lg w-full p-2" value={major} onChange={(e) => setMajor(e.target.value)} />
+                            <label className="block text-sm font-semibold mb-1">สาขาวิชา</label>
+                            <select 
+                                className="border rounded-lg w-full p-2 bg-white" 
+                                value={major} 
+                                onChange={(e) => setMajor(e.target.value)}
+                            >
+                                <option value="" disabled hidden>เลือกสาขาวิชา</option>
+                                <option value="CS">สาขาวิชาวิทยาการคอมพิวเตอร์</option>
+                                <option value="ITDI">สาขาวิชาเทคโนโลยีสารสนเทศเพื่ออุตสาหกรรมดิจิทัล</option>
+                                <option value="SE">สาขาวิชาวิศวกรรมซอฟต์แวร์</option>
+                                <option value="AAI">สาขาวิชาปัญญาประดิษฐ์ประยุกต์และเทคโนโลยีอัจฉริยะ</option>
+                            </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold mb-1">Graduation Year</label>
+                            <label className="block text-sm font-semibold mb-1">รุ่นปีการศึกษา</label>
                             <input type="text" className="border rounded-lg w-full p-2" value={graduationYear} onChange={(e) => setGraduationYear(e.target.value)} />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold mb-1">Email</label>
+                            <label className="block text-sm font-semibold mb-1">อีเมล</label>
                             <input type="email" className="border rounded-lg w-full p-2" value={email} onChange={(e) => setEmail(e.target.value)} />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold mb-1">Job Position</label>
+                            <label className="block text-sm font-semibold mb-1">ตำแหน่งงาน</label>
                             <input type="text" className="border rounded-lg w-full p-2" value={jobPosition} onChange={(e) => setJobPosition(e.target.value)} />
                         </div>
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-semibold mb-1">Workplace</label>
+                            <label className="block text-sm font-semibold mb-1">สถานที่ทำงาน</label>
                             <input type="text" className="border rounded-lg w-full p-2" value={workplace} onChange={(e) => setWorkplace(e.target.value)} />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-semibold mb-1">Additional Information</label>
+                        <label className="block text-sm font-semibold mb-1">ข้อมูลเพิ่มเติม</label>
                         <textarea className="border rounded-lg w-full p-2 h-24" value={additionalInfo} onChange={(e) => setAdditionalInfo(e.target.value)}></textarea>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-semibold mb-1">Featured Image</label>
+                        <label className="block text-sm font-semibold mb-1">รูปถ่ายของท่าน</label>
                         <input 
                             type="file" 
                             className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
