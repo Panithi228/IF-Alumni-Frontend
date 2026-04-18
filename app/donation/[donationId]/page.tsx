@@ -28,7 +28,7 @@ export default function DonationId() {
     const [submitted, setSubmitted] = useState(false);
     const [today, setToday] = useState('');
 
-    const DEFAULT_IMAGE = 'http://localhost:8000/wp-content/uploads/2026/04/user-icon-fake-photo-sign-profile-button-simple-style-social-media-poster-background-symbol-user-brand-logo-design-element-user-t-shirt-printing-for-sticker-free-vector.jpg';
+    const DEFAULT_IMAGE = 'http://dekdee2.informatics.buu.ac.th:8041/wp-content/uploads/2026/04/user-icon-fake-photo-sign-profile-button-simple-style-social-media-poster-background-symbol-user-brand-logo-design-element-user-t-shirt-printing-for-sticker-free-vector.jpg';
 
     const getFeaturedImageUrl = (project) => {
         if (project._embedded && project._embedded['wp:featuredmedia']) {
