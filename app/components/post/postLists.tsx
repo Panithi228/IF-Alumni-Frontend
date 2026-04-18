@@ -137,6 +137,55 @@ const PostLists = ({token}: Props) => {
             }
         }
     }
+    
+    const handleReject = async (id: number) => {
+        const result = await Swal.fire({
+            title: 'ยืนยันการลบ?',
+            text: "รายการนี้จะถูกย้ายไปยังถังขยะ",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'ใช่, ลบเลย!',
+            cancelButtonText: 'ยกเลิก'
+        });
+
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'กำลังดำเนินการ...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            try {
+                const response = await fetch(
+                    `http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/alumni/${id}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': 'Bearer ' + window.localStorage.getItem('jwtToken')
+                        }
+                    }
+                );
+
+                if (response.ok) {
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'ลบเรียบร้อย!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    fetchPosts();
+                } else {
+                    throw new Error('Delete failed');
+                }
+            } catch (error) {
+                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถลบได้ในขณะนี้', 'error');
+            }
+        }
+    };
 
     const handleHide = async (id: number) => {
         const result = await Swal.fire({
@@ -298,6 +347,7 @@ const PostLists = ({token}: Props) => {
                 onClose={() => setIsNotiModalOpen(false)} 
                 drafts={draftAlumni} 
                 onApprove={token ? handleApprove : undefined} 
+                onReject={token ? handleReject : undefined}
             />
             
             {/* Header Section */}

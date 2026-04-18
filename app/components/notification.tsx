@@ -11,9 +11,10 @@ type Props = {
     onClose: () => void;
     drafts: Alumni[];
     onApprove?: (id: number) => void;
+    onReject?: (id: number) => void;
 };
 
-const Notification = ({ isOpen, onClose, drafts, onApprove }: Props) => {
+const Notification = ({ isOpen, onClose, drafts, onApprove, onReject }: Props) => {
     const token = typeof window !== 'undefined' ? window.localStorage.getItem('jwtToken') : null;
     
     if (!isOpen) return null;
@@ -45,8 +46,17 @@ const Notification = ({ isOpen, onClose, drafts, onApprove }: Props) => {
                                     <Link href={`/about/${alumni.id}`} className="text-sm text-gray-500 hover:underline">
                                         <span className="font-semibold text-gray-800 mb-2" dangerouslySetInnerHTML={{ __html: alumni.title.rendered }}></span>
                                     </Link>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-xs text-gray-400">ID: #{alumni.id}</span>
+                                    <div className="flex justify-end items-center gap-5">
+                                        {/* <span className="text-xs text-gray-400">ID: #{alumni.id}</span> */}
+                                        {onReject && (
+                                            <button
+                                                onClick={() => onReject(alumni.id)}
+                                                className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-shadow shadow-sm cursor-pointer"
+                                            >
+                                                Reject
+                                            </button>
+                                        )}
+                                        
                                         {onApprove && (
                                             <button
                                                 onClick={() => onApprove(alumni.id)}

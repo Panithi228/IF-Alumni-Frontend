@@ -91,7 +91,7 @@ export default function AboutId({ params }: { params: Promise<{ aboutId: string 
             </div>
 
             {/* Content */}
-            <div className="bg-white rounded-xl leading-loose min-h-100 mx-[15vw] border border-[#dde5f0] shadow-lg">
+            <div className="bg-white rounded-xl mx-10 leading-loose min-h-100 border border-[#dde5f0] shadow-lg">
                 <div className="bg-white border-b border-[#dde5f0] rounded-xl overflow-hidden">
                     <h2
                         className="text-6xl font-bold mb-4 m-2"
@@ -100,7 +100,7 @@ export default function AboutId({ params }: { params: Promise<{ aboutId: string 
                 </div>
 
                 <div
-                    className="px-6 py-5 text-[18px] leading-loose text-[#4A5F7A] whitespace-pre-line"
+                    className="px-6 py-5 text-[18px] leading-loose text-[#4A5F7A] whitespace-pre-line break-words"
                     dangerouslySetInnerHTML={{ __html: post.acf.additional_info }}
                 />
             </div>
