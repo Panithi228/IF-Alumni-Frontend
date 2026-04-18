@@ -13,7 +13,7 @@ const AddDonationModal = ({ handleCloseEvent, fetchDataEvent}: Props) => {
     const [projectName, setProjectName] = useState('');
     const [projectInfo, setProjectInfo] = useState('');
     const [taxDeduction, setTaxDeduction] = useState('');
-    const fileInputRef = useRef(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
