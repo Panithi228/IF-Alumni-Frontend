@@ -58,7 +58,7 @@ const PostLists = ({token}: Props) => {
         try {
             const url = activeToken
                 ? `http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/alumni?status=publish,pending,draft&per_page=100&page=${pageNum}&_embed`
-                : `http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/alumni?status=publish&per_page=100&page=${pageNum}&_embed`;
+                : `http://dekdee2.informatics.buu.ac.th:8041/wp-json/alumni-api/v1/alumni-all?per_page=100&page=${pageNum}&_embed`;
 
             const response = await fetch(url, {
                 headers: activeToken ? { Authorization: 'Bearer ' + activeToken } : {}
@@ -276,14 +276,12 @@ const PostLists = ({token}: Props) => {
 
     return (
         <div className="max-w-6xl mx-auto p-6">
-            {token && (
-                <Notification
-                    isOpen={isNotiModalOpen} 
-                    onClose={() => setIsNotiModalOpen(false)} 
-                    drafts={draftAlumni} 
-                    onApprove={token ? handleApprove : undefined} 
-                />
-            )}
+            <Notification
+                isOpen={isNotiModalOpen} 
+                onClose={() => setIsNotiModalOpen(false)} 
+                drafts={draftAlumni} 
+                onApprove={token ? handleApprove : undefined} 
+            />
             
             {/* Header Section */}
             <div className="flex justify-between items-center mb-8 pb-4 border-b border-gray-100">
@@ -298,24 +296,22 @@ const PostLists = ({token}: Props) => {
                         <span className="text-xl">+</span> Add Alumni
                     </button>
 
-                    {/* ปุ่ม Notification จะแสดงเมื่อทำการ login เท่านั้น */}
-                    {token && (
-                        <button 
-                            onClick={() => setIsNotiModalOpen(true)}
-                            className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-all cursor-pointer group"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 group-hover:text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                            </svg>
-                            
-                            {/* Badge ตัวเลขสีแดง (จะแสดงเฉพาะเมื่อมี Pending) */}
-                            {draftAlumni.length > 0 && (
-                                <span className="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white animate-bounce">
-                                    {draftAlumni.length}
-                                </span>
-                            )}
-                        </button>
-                    )}
+                    {/* ปุ่ม Notification */}
+                    <button 
+                        onClick={() => setIsNotiModalOpen(true)}
+                        className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-all cursor-pointer group"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 group-hover:text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        
+                        {/* Badge ตัวเลขสีแดง (จะแสดงเฉพาะเมื่อมี Pending) */}
+                        {draftAlumni.length > 0 && (
+                            <span className="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white animate-bounce">
+                                {draftAlumni.length}
+                            </span>
+                        )}
+                    </button>
                 </div>
             </div>
 

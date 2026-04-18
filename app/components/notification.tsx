@@ -13,6 +13,8 @@ type Props = {
 };
 
 const Notification = ({ isOpen, onClose, drafts, onApprove }: Props) => {
+    const token = typeof window !== 'undefined' ? window.localStorage.getItem('jwtToken') : null;
+    
     if (!isOpen) return null;
 
     return (
