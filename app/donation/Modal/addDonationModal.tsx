@@ -97,7 +97,7 @@ const AddDonationModal = ({ handleCloseEvent, fetchDataEvent}: Props) => {
 
     const handleClick = () => {
         if (fileInputRef.current) {
-            fileInputRef.current.click();
+            fileInputRef.current?.click();
         }
     };
 
