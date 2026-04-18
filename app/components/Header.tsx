@@ -113,7 +113,7 @@ export default function Header() {
                 letterSpacing: '1.5px',
                 textTransform: 'uppercase',
               }}>
-                Burapha University Â· Informatics
+                Burapha University A Informatics
               </span>
             </div>
           </div>
@@ -161,7 +161,7 @@ export default function Header() {
             {token ? (
               <button
                 onClick={handleLogout}
-                className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-white font-medium transition cursor-pointer"
+                className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-white font-medium transition cursor-pointer"
               >
                 Logout
               </button>

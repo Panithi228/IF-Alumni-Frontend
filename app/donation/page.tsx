@@ -22,7 +22,7 @@ export default function Donation() {
 
   const getFeaturedImageUrl = (project) => {
       if (project._embedded && project._embedded['wp:featuredmedia']) {
-          return project._embedded['wp:featuredmedia'][0].source_url;
+          return project._embedded['wp:featuredmedia'][0]?.source_url;
       }
       return DEFAULT_IMAGE;
   }
@@ -49,7 +49,7 @@ export default function Donation() {
           });
 
           try {
-              const response = await fetch(`ttp://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/project/${id}`, {
+              const response = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/project/${id}`, {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json',
@@ -238,7 +238,7 @@ export default function Donation() {
 
                     <Link href={`/donation/${project.id}`}>
                       <div className="p-5 h-30">
-                          <h3 className="text-xl font-bold text-gray-800 mb-1 hover:text-indigo-600 transition-colors" 
+                          <h3 className="line-clamp-1 text-xl font-bold text-gray-800 mb-1 hover:text-indigo-600 transition-colors" 
                               dangerouslySetInnerHTML={{ __html: project.title.rendered }}>
                           </h3>
 
