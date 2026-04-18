@@ -1,4 +1,5 @@
 'use client';
+import Link from "next/link";
 
 type Alumni = {
     id: number;
@@ -41,7 +42,9 @@ const Notification = ({ isOpen, onClose, drafts, onApprove }: Props) => {
                         <div className="space-y-3">
                             {drafts.map((alumni) => (
                                 <div key={alumni.id} className="flex flex-col p-4 rounded-xl border border-gray-100 bg-gray-50 hover:bg-amber-50/50 transition-colors">
-                                    <span className="font-semibold text-gray-800 mb-2" dangerouslySetInnerHTML={{ __html: alumni.title.rendered }}></span>
+                                    <Link href={`/about/${alumni.id}`} className="text-sm text-gray-500 hover:underline">
+                                        <span className="font-semibold text-gray-800 mb-2" dangerouslySetInnerHTML={{ __html: alumni.title.rendered }}></span>
+                                    </Link>
                                     <div className="flex justify-between items-center">
                                         <span className="text-xs text-gray-400">ID: #{alumni.id}</span>
                                         {onApprove && (

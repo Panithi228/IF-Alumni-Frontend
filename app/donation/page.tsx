@@ -238,7 +238,7 @@ export default function Donation() {
 
                     <Link href={`/donation/${project.id}`}>
                       <div className="p-5 h-30">
-                          <h3 className="text-xl font-bold text-gray-800 mb-1 hover:text-indigo-600 transition-colors" 
+                          <h3 className="line-clamp-1 text-xl font-bold text-gray-800 mb-1 hover:text-indigo-600 transition-colors" 
                               dangerouslySetInnerHTML={{ __html: project.title.rendered }}>
                           </h3>
 
