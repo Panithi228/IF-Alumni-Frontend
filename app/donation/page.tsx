@@ -22,7 +22,7 @@ export default function Donation() {
 
   const getFeaturedImageUrl = (project) => {
       if (project._embedded && project._embedded['wp:featuredmedia']) {
-          return project._embedded['wp:featuredmedia'][0].source_url;
+          return project._embedded['wp:featuredmedia'][0]?.source_url;
       }
       return DEFAULT_IMAGE;
   }

@@ -84,7 +84,7 @@ const PostLists = ({token}: Props) => {
 
     const getFeaturedImageUrl = (post) => {
         if (post._embedded && post._embedded['wp:featuredmedia']) {
-            return post._embedded['wp:featuredmedia'][0].source_url;
+            return post._embedded['wp:featuredmedia'][0]?.source_url || DEFAULT_IMAGE;
         }
         return DEFAULT_IMAGE;
     }
@@ -374,9 +374,11 @@ const PostLists = ({token}: Props) => {
                                     alt={post.title.rendered}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                 />
-                                <span className={`absolute top-3 right-3 ${getStatusColor(post.status)} text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase shadow-sm`}>
-                                    {post.status}
-                                </span>
+                                {token && (
+                                    <span className={`absolute top-3 right-3 ${getStatusColor(post.status)} text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase shadow-sm`}>
+                                        {post.status}
+                                    </span>
+                                )}
                             </div>
 
                             {/* Content Area */}

@@ -60,7 +60,7 @@ export default function AboutId({ params }: { params: Promise<{ aboutId: string 
     }
 
     return (
-        <div className="flex flex-col max-w bg-gray-100 min-h-full">
+        <div className="flex flex-col max-w bg-gray-50 min-h-full">
             {/* Profile */}
             <div className=" p-10 flex align-items-center justify-center">
                 <img 
@@ -75,6 +75,7 @@ export default function AboutId({ params }: { params: Promise<{ aboutId: string 
                     <p className="text-2xl  font-medium">ปีการศึกษา {post.acf?.graduation_year}</p>
                     {/* <p>ระดับการศึกษา {post.acf?.degree}</p> */}
                     <p className="text-2xl  font-medium">ตำแหน่งงาน {post.acf?.job_position}</p>
+                    <p className="text-2xl  font-medium">สถานที่ทำงาน {post.acf?.workplace}</p>
 
                     {/* 👇 status badge */}
                     {/* <span className={`inline-block mt-2 px-2 py-1 text-xs text-white rounded ${
@@ -90,7 +91,7 @@ export default function AboutId({ params }: { params: Promise<{ aboutId: string 
             </div>
 
             {/* Content */}
-            <div className="bg-white mx-10 rounded-xl leading-loose min-h-100">
+            <div className="bg-white rounded-xl leading-loose min-h-100 mx-[15vw] border border-[#dde5f0] shadow-lg">
                 <div className="bg-white border-b border-[#dde5f0] rounded-xl overflow-hidden">
                     <h2
                         className="text-6xl font-bold mb-4 m-2"
@@ -104,7 +105,7 @@ export default function AboutId({ params }: { params: Promise<{ aboutId: string 
                 />
             </div>
 
-            <div className="flex bg-gray-100 justify-end p-6">
+            <div className="flex bg-gray-50 justify-end p-6 mt-9">
                 <button 
                     onClick={() => openEditPostModal(post.id)}
                     className="bg-amber-100 hover:bg-amber-200 text-amber-700 text-md font-semibold py-3 px-20 rounded-lg transition-colors border border-amber-400 cursor-pointer"
