@@ -49,7 +49,7 @@ export default function Donation() {
           });
 
           try {
-              const response = await fetch(`http://localhost:8000/wp-json/wp/v2/project/${id}`, {
+              const response = await fetch(`ttp://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/project/${id}`, {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json',
@@ -97,7 +97,7 @@ export default function Donation() {
           });
 
           try {
-              const response = await fetch(`http://localhost:8000/wp-json/wp/v2/project/${id}`, {
+              const response = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/project/${id}`, {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json',
@@ -131,8 +131,8 @@ export default function Donation() {
 
     try {
       const url = activeToken
-        ? `http://localhost:8000/wp-json/wp/v2/project?status=publish,pending,draft&per_page=9&page=${pageNum}&_embed`
-        : `http://localhost:8000/wp-json/wp/v2/project?status=publish&per_page=9&page=${pageNum}&_embed`;
+        ? `http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/project?status=publish,pending,draft&per_page=9&page=${pageNum}&_embed`
+        : `http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/project?status=publish&per_page=9&page=${pageNum}&_embed`;
 
       const response = await fetch(url, {
         headers: activeToken
@@ -224,9 +224,16 @@ export default function Donation() {
                             alt={project.title.rendered}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
-                        <span className={`absolute top-3 right-3 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase shadow-sm`}>
-                            {project.taxDeduction}
-                        </span>
+
+                        {/* Banner Container */}
+                        {project.acf.tax_deduction > 1 && (
+                          <div className="absolute top-0 right-0 w-36 h-36 overflow-hidden pointer-events-none z-10">
+                              <div className="bg-red-600 text-white text-[14px] font-extrabold py-1.5 w-[160%] absolute top-[12px] -right-[68px] rotate-40 shadow-lg flex flex-col items-center justify-center uppercase tracking-tighter border-y border-white/20">
+                                  <span className="leading-tight">ลดหย่อนภาษี</span>
+                                  <span className="text-[16px] -mt-0.5">{project.acf.tax_deduction} เท่า</span>
+                              </div>
+                          </div>
+                        )}
                     </div>
 
                     <Link href={`/donation/${project.id}`}>

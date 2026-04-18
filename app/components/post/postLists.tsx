@@ -57,8 +57,8 @@ const PostLists = ({token}: Props) => {
 
         try {
             const url = activeToken
-                ? `http://localhost:8000/wp-json/wp/v2/alumni?status=publish,pending,draft&per_page=100&page=${pageNum}&_embed`
-                : `http://localhost:8000/wp-json/wp/v2/alumni?status=publish&per_page=100&page=${pageNum}&_embed`;
+                ? `http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/alumni?status=publish,pending,draft&per_page=100&page=${pageNum}&_embed`
+                : `http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/alumni?status=publish&per_page=100&page=${pageNum}&_embed`;
 
             const response = await fetch(url, {
                 headers: activeToken ? { Authorization: 'Bearer ' + activeToken } : {}
@@ -109,7 +109,7 @@ const PostLists = ({token}: Props) => {
             });
 
             try {
-                const response = await fetch(`http://localhost:8000/wp-json/wp/v2/alumni/${id}`, {
+                const response = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/alumni/${id}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -157,7 +157,7 @@ const PostLists = ({token}: Props) => {
             });
 
             try {
-                const response = await fetch(`http://localhost:8000/wp-json/wp/v2/alumni/${id}`, {
+                const response = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/alumni/${id}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -205,7 +205,7 @@ const PostLists = ({token}: Props) => {
             });
 
             try {
-                const response = await fetch(`http://localhost:8000/wp-json/wp/v2/alumni/${id}`, {
+                const response = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/alumni/${id}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -234,7 +234,7 @@ const PostLists = ({token}: Props) => {
     // ฟังก์ชันสำหรับสร้าง JWT Token
     const generateJWTToken = async () => {
         try {
-            const response = await fetch('http://localhost:8000/wp-json/jwt-auth/v1/token', {
+            const response = await fetch('http://dekdee2.informatics.buu.ac.th:8041/wp-json/jwt-auth/v1/token', {
                 'method': 'POST',
                 'headers': {
                     'Content-Type': 'application/json'
@@ -257,7 +257,7 @@ const PostLists = ({token}: Props) => {
     // ฟังก์ชันสำหรับตรวจสอบ JWT Token
     const validateJWTToken = async (token: string) => {
         try {
-            const response = await fetch('http://localhost:8000/wp-json/jwt-auth/v1/token/validate', {
+            const response = await fetch('http://dekdee2.informatics.buu.ac.th:8041/wp-json/jwt-auth/v1/token/validate', {
                 'method': 'POST',
                 'headers': {
                     'Authorization': 'Bearer ' + token

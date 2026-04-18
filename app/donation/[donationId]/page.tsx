@@ -67,7 +67,7 @@ export default function DonationId() {
                 formData.append('donation_receipt', donationReceipt);
             }
 
-            const res = await fetch('http://localhost:8000/wp-json/alumni-api/v1/donation', {
+            const res = await fetch('http://dekdee2.informatics.buu.ac.th:8041/wp-json/alumni-api/v1/donation', {
                 method: 'POST',
                 body: formData,
             });
@@ -87,7 +87,7 @@ export default function DonationId() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/wp-json/wp/v2/project/${donationId}?_embed`);
+                const response = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/project/${donationId}?_embed`);
                 const data = await response.json();
                 setProject(data);
             } catch (error) {

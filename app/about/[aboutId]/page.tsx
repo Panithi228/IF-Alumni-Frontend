@@ -36,7 +36,7 @@ export default function AboutId({ params }: { params: Promise<{ aboutId: string 
         try {
             const token = window.localStorage.getItem('jwtToken');
 
-            const res = await fetch(`http://localhost:8000/wp-json/wp/v2/alumni/${aboutId}?_embed`,{
+            const res = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/alumni/${aboutId}?_embed`,{
                     headers: token
                         ? { 
                         Authorization: 'Bearer ' + token 

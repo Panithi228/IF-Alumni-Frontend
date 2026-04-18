@@ -24,7 +24,7 @@ const AddPostModal = ({ handleCloseEvent, fetchDataEvent }: Props) => {
     const [uploadFile, setUploadFile] = useState<File | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const API_BASE_URL = 'http://localhost:8000/wp-json';
+    const API_BASE_URL = 'http://dekdee2.informatics.buu.ac.th:8041/wp-json';
 
     //Handle form submission
     const handleSingleSubmit = async (event: React.FormEvent) => {
@@ -186,7 +186,7 @@ const AddPostModal = ({ handleCloseEvent, fetchDataEvent }: Props) => {
             formData.append('file', image);
             formData.append('alt_text', 'Featured Image');
 
-            const response = await fetch('http://localhost:8000/wp-json/wp/v2/media', {
+            const response = await fetch('http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/media', {
                 'method': 'POST',
                 'headers': {
                     'Authorization': 'Bearer ' + window.localStorage.getItem('jwtToken'),

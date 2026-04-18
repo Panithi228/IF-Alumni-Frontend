@@ -41,8 +41,18 @@ export default function Header() {
 
           <div className="flex items-center gap-5">
             <Link href={"/donation"}>
-              <h1 className="text-md font-medium">Donation</h1>
+              <h1 className="relative w-fit text-md font-medium after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full">
+                Donation
+              </h1>
             </Link>
+
+            {token && (
+              <Link href={"/summary"}>
+                <h1 className="relative w-fit text-md font-medium after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full">
+                  Donation Summary
+                </h1>
+              </Link>
+            )}
 
             {token ? (
               <button

@@ -26,7 +26,7 @@ const EditPostModal = ({ postId, handleCloseEvent, fetchDataEvent }: Props) => {
     const [originalStudentId, setOriginalStudentId] = useState('');
     const [originalEmail, setOriginalEmail] = useState('');
 
-    const API_BASE_URL = 'http://localhost:8000/wp-json';
+    const API_BASE_URL = 'http://dekdee2.informatics.buu.ac.th:8041/wp-json';
 
     useEffect(() => {
         const fetchCurrentPost = async () => {
@@ -36,7 +36,7 @@ const EditPostModal = ({ postId, handleCloseEvent, fetchDataEvent }: Props) => {
                 const headers: Record<string, string> = {};
                 if (token) headers['Authorization'] = 'Bearer ' + token;
 
-                const response = await fetch(`http://localhost:8000/wp-json/wp/v2/alumni/${postId}?_embed`, { headers });
+                const response = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/alumni/${postId}?_embed`, { headers });
                 const data = await response.json();
 
                 setFullName(data.title.rendered || '');
@@ -74,7 +74,7 @@ const EditPostModal = ({ postId, handleCloseEvent, fetchDataEvent }: Props) => {
     const handleImageUpload = async (image: File) => {
         const formData = new FormData();
         formData.append('file', image);
-        const response = await fetch('http://localhost:8000/wp-json/wp/v2/media', {
+        const response = await fetch('http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/media', {
             method: 'POST',
             headers: { 
                 'Authorization': 'Bearer ' + window.localStorage.getItem('jwtToken')

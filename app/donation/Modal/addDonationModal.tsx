@@ -17,7 +17,7 @@ const AddDonationModal = ({ handleCloseEvent, fetchDataEvent}: Props) => {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const API_BASE_URL = 'http://localhost:8000/wp-json/wp/v2'
+    const API_BASE_URL = 'http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2'
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -42,7 +42,7 @@ const AddDonationModal = ({ handleCloseEvent, fetchDataEvent}: Props) => {
                 imageFormData.append('file', featuredImage);
                 imageFormData.append('title', projectName);
 
-                const imgResponse = await fetch(`http://localhost:8000/wp-json/wp/v2/media`, {
+                const imgResponse = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/media`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: imageFormData
