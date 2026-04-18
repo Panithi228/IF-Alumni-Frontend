@@ -23,6 +23,9 @@ const PostLists = ({token}: Props) => {
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
+    const [search, setSearch] = useState('');
+    const [selectedMajor, setSelectedMajor] = useState('ทั้งหมด');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
     const DEFAULT_IMAGE = 'http://dekdee2.informatics.buu.ac.th:8041/wp-content/uploads/2026/04/user-icon-fake-photo-sign-profile-button-simple-style-social-media-poster-background-symbol-user-brand-logo-design-element-user-t-shirt-printing-for-sticker-free-vector.jpg';
 
@@ -270,6 +273,20 @@ const PostLists = ({token}: Props) => {
         }
     }
 
+    const filteredAlumni = publishedAlumni
+        .filter(post => {
+            const name = post.title?.rendered?.toLowerCase() ?? '';
+            const major = MAJOR_MAP[post.acf?.major] ?? post.acf?.major ?? '';
+            const matchName  = name.includes(search.toLowerCase());
+            const matchMajor = selectedMajor === 'ทั้งหมด' || major === selectedMajor;
+            return matchName && matchMajor;
+        })
+        .sort((a, b) =>
+            sortOrder === 'desc'
+                ? (b.acf?.graduation_year ?? 0) - (a.acf?.graduation_year ?? 0)
+                : (a.acf?.graduation_year ?? 0) - (b.acf?.graduation_year ?? 0)
+        );
+
     useEffect(() => {
         fetchPosts(1, true);
     }, [token]);
@@ -315,6 +332,32 @@ const PostLists = ({token}: Props) => {
                 </div>
             </div>
 
+            <div className="flex flex-wrap gap-3 mb-6">
+                <input
+                    type="text"
+                    placeholder="ค้นหาชื่อศิษย์เก่า..."
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    className="flex-1 min-w-[200px] px-4 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-300"
+                />
+                <select
+                    value={selectedMajor}
+                    onChange={e => setSelectedMajor(e.target.value)}
+                    className="flex-1 min-w-[200px] px-4 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 cursor-pointer"
+                >
+                    <option value="ทั้งหมด">ทุกสาขา</option>
+                    {Object.values(MAJOR_MAP).map(m => (
+                        <option key={m} value={m}>{m}</option>
+                    ))}
+                </select>
+                <button
+                    onClick={() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
+                    className="px-4 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 hover:bg-gray-100 cursor-pointer whitespace-nowrap"
+                >
+                    {sortOrder === 'desc' ? 'ปีล่าสุด ↓' : 'ปีเก่าสุด ↑'}
+                </button>
+            </div>
+
             {/* Loading State */}
             {loading ? (
                 <div className="flex justify-center my-20">
@@ -322,7 +365,7 @@ const PostLists = ({token}: Props) => {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {publishedAlumni.length > 0 ? publishedAlumni.map((post) => (
+                    {filteredAlumni.length > 0 ? filteredAlumni.map((post) => (
                         <div key={post.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all group">
                             {/* Image Area */}
                             <div className="h-56 bg-gray-200 overflow-hidden relative">
