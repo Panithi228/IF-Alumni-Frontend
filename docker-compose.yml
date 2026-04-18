@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  nextjs:
+    container_name: if-alumni-frontend
+    build:
+      context: .
+    ports:
+      - "8042:3000"
+    restart: unless-stopped
