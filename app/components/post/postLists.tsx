@@ -15,7 +15,7 @@ const PostLists = ({token}: Props) => {
     const [addPostModalOpen, setAddPostModalOpen] = useState(false);
     const [editPostModalOpen, setEditPostModalOpen] = useState(false);
     const [selectedPostId, setSelectedPostId] = useState(null); 
-    const [posts, setPosts] = useState([]);
+    const [posts, setPosts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [isNotiModalOpen, setIsNotiModalOpen] = useState(false);
     const publishedAlumni = posts.filter(post => post.status === 'publish' || post.status === 'draft');
@@ -137,7 +137,7 @@ const PostLists = ({token}: Props) => {
             }
         }
     }
-    
+
     const handleReject = async (id: number) => {
         const result = await Swal.fire({
             title: 'ยืนยันการลบ?',
