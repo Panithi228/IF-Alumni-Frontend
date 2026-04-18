@@ -182,7 +182,6 @@ export default function DonationId() {
                     <div className="flex flex-cols-2 gap-8">
                         {/* Option 1: QR Code */}
                         <button 
-                            disabled
                             onClick={() => setPaymentMethod('qr')}
                             className={`flex-1 group relative p-3 border-2 rounded-xl transition-all duration-300 shadow-sm
                                 ${paymentMethod === 'qr' 
@@ -259,7 +258,7 @@ export default function DonationId() {
                             ? "bg-indigo-800 text-white hover:bg-indigo-900 shadow-lg cursor-pointer" 
                             : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
                     >
-                        ยืนยันการบริจาค
+                        ดำเนินการต่อ
                     </button>
                 </div>
             )}
@@ -488,7 +487,7 @@ export default function DonationId() {
             )}
 
             {/* Step 3 Form */}
-            {step === 3 && (
+            {step === 3 && paymentMethod === 'bank' && (
                 <div className='ml-6'>
                     <div className="grid grid-cols-2 gap-4">
                         <div className='bg-white p-3 rounded-xl'>
@@ -519,6 +518,140 @@ export default function DonationId() {
                                 </div>
                                 <div>
                                     <label className='text-lg'>3861004429</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className='bg-white p-3 rounded-xl'>
+                            <div className='p-2 mb-4'>
+                                <h2 className='text-xl font-bold'>รายละเอียดการบริจาค</h2>
+                            </div>
+
+                            <div className='flex p-2 justify-between'>
+                                <div>
+                                    <label className='text-lg'>เลขที่ใบเสร็จ</label>
+                                </div>
+
+                                <div>
+                                    <label className='text-lg'>{receiptNo || 'จะออกหลังจากยืนยันการบริจาค'}</label>
+                                </div>
+                            </div>
+
+                            <div className='flex p-2 justify-between'>
+                                <div>
+                                    <label className='text-lg'>วันที่</label>
+                                </div>
+
+                                <div>
+                                    <label className='text-lg'>{today || 'กำลังโหลด...'}</label>
+                                </div>
+                            </div>
+
+                            <div className='flex p-2 justify-between'>
+                                <div>
+                                    <label className='text-lg'>ชื่อผู้บริจาค</label>
+                                </div>
+
+                                <div>
+                                    <label className='text-lg'>{prefix + ' ' + fullName}</label>
+                                </div>
+                            </div>
+
+                            <div className='flex p-2 justify-between'>
+                                <div>
+                                    <div>
+                                        <label className='text-lg'>เลขประจำตัวผู้เสียภาษี/</label>
+                                    </div>
+                                    <label className='text-lg'>เลขประจำตัวประชาชน</label>
+                                </div>
+
+                                <div>
+                                    <label className='text-lg'>{taxId}</label>
+                                </div>
+                            </div>
+
+                            <div className='flex p-2 justify-between'>
+                                <div className='overflow'>
+                                    <label className='text-lg'>จำนวนเงิน</label>
+                                </div>
+
+                                <div>
+                                    <label className='text-lg'>{donateAmount} บาท</label>
+                                </div>
+                            </div>
+
+                            <div className='flex p-2 justify-between'>
+                                <div>
+                                    <label className='text-lg'>โครงการ</label>
+                                </div>
+
+                                <div>
+                                    <label className='text-lg'>{project.acf.project_name}</label>
+                                </div>
+                            </div>
+
+                            <div className='flex p-2 justify-between border-b border-gray-300'>
+                                <div>
+                                    <label className='text-lg'>องค์กร</label>
+                                </div>
+
+                                <div>
+                                    <label className='text-lg'>มหาวิทยาลัยบูรพา</label>
+                                </div>
+                            </div>
+
+                            <div className='p-2 mb-4'>
+                                <h2 className='text-xl font-bold'>แนบหลักฐานการโอนเงิน <span className='text-red-500 font-bold'>*</span></h2>
+                            </div>
+                            
+                            <div>
+                                <input
+                                    type="file"
+                                    className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                    onChange={(e) => setDonationReceipt(e.target.files ? e.target.files[0] : null)}
+                                    required
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-6">
+                        <button
+                            disabled={!donationReceipt}
+                            onClick={handleSubmitDonation}
+                            className={`w-full py-4 rounded-xl font-bold text-lg transition-all
+                                ${donationReceipt 
+                                    ? "bg-indigo-800 text-white hover:bg-indigo-900 shadow-lg cursor-pointer"
+                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
+                        >
+                            ยืนยันการบริจาค
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {step === 3 && paymentMethod === 'qr' && (
+                <div className='ml-6'>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className='bg-white p-3 rounded-xl'>
+                            <div className="flex-1 justify-center bg-indigo-900 w-full p-3 mb-5 rounded-xl">
+                                <p className='text-white text-xl font-bold text-center'>แสกนบริจาค</p>
+                            </div>
+
+                            <div className='flex justify-center items-center w-full p-5 mb-3 rounded-xl'>
+                                <img src="/images/qrcode_mock.png" alt="qrcode" />
+                            </div>
+
+                            <div className='my-2 p-2 border-b border-gray-300'>
+                                <label className='text-lg font-bold'>ธนาคารกรุงไทย</label>
+                            </div>
+
+                            <div className='flex p-2 my-2 justify-between'>
+                                <div>
+                                    <label className='text-lg'>ชื่อบัญชี</label>
+                                </div>
+                                <div>
+                                    <label className='text-lg'>มหาวิทยาลัยบูรพา</label>
                                 </div>
                             </div>
                         </div>
