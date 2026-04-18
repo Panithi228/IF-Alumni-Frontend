@@ -216,7 +216,7 @@ export default function Donation() {
                 </div>
             ): (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {projectLists.length > 0 ? projectLists.map((project) => (
+                {projectLists.length > 0 ? projectLists.map((project: any) => (
                   <div key={project.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all group">
                     <div className="h-56 bg-gray-200 overflow-hidden relative">
                         <img 
