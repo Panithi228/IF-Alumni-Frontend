@@ -96,10 +96,12 @@ const AddDonationModal = ({ handleCloseEvent, fetchDataEvent}: Props) => {
     };
 
     const handleClick = () => {
-        fileInputRef.current.click();
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
     };
 
-    const handleChange = (e) => {
+    const handleChange = (e: any) => {
         const file = e.target.files?.[0];
         if (file) {
         setFeaturedImage(file);
