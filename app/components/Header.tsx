@@ -113,7 +113,7 @@ export default function Header() {
                 letterSpacing: '1.5px',
                 textTransform: 'uppercase',
               }}>
-                Burapha University Â· Informatics
+                Burapha University A Informatics
               </span>
             </div>
           </div>
