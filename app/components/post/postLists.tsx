@@ -82,7 +82,7 @@ const PostLists = ({token}: Props) => {
         }
     };
 
-    const getFeaturedImageUrl = (post) => {
+    const getFeaturedImageUrl = (post: any) => {
         if (post._embedded && post._embedded['wp:featuredmedia']) {
             return post._embedded['wp:featuredmedia'][0]?.source_url || DEFAULT_IMAGE;
         }
