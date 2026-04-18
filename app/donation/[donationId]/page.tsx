@@ -7,7 +7,7 @@ export default function DonationId() {
     const [project, setProject] = useState<any>(null);
     const [step, setStep] = useState(1);
     const [paymentMethod, setPaymentMethod] = useState('');
-    const [donateAmount, setDonateAmount] = useState();
+    const [donateAmount, setDonateAmount] = useState<number>();
     const [receipt, setReceipt] = useState(true);
     const [donationType, setDonationType] = useState('');
     const [prefix, setPrefix] = useState('');
