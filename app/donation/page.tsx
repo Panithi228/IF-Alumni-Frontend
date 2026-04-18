@@ -10,7 +10,7 @@ export default function Donation() {
   const [token, setToken] = useState<string | null>(null);
   const [addDonationModalOpen, setAddDonationModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [projectLists, setProjectLists] = useState([]);
+  const [projectLists, setProjectLists] = useState<any>([]);
   const pathname = usePathname();
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
