@@ -60,7 +60,7 @@ export default function AboutId({ params }: { params: Promise<{ aboutId: string 
     }
 
     return (
-        <div className="flex flex-col max-w bg-gray-100 min-h-screen">
+        <div className="flex flex-col max-w bg-gray-100 min-h-full">
             {/* Profile */}
             <div className=" p-10 flex align-items-center justify-center">
                 <img 
@@ -90,14 +90,16 @@ export default function AboutId({ params }: { params: Promise<{ aboutId: string 
             </div>
 
             {/* Content */}
-            <div className="bg-gray-100 pl-10 leading-loose">
-                <h2
-                    className="text-6xl font-bold mb-4"
-                    dangerouslySetInnerHTML={{ __html: post.title.rendered }}
-                />
+            <div className="bg-white mx-10 rounded-xl leading-loose min-h-100">
+                <div className="bg-white border-b border-[#dde5f0] rounded-xl overflow-hidden">
+                    <h2
+                        className="text-6xl font-bold mb-4 m-2"
+                        dangerouslySetInnerHTML={{ __html: post.title.rendered }}
+                    />
+                </div>
 
                 <div
-                    className="text-2xl font-medium mt-10 whitespace-pre-line"
+                    className="px-6 py-5 text-[18px] leading-loose text-[#4A5F7A] whitespace-pre-line"
                     dangerouslySetInnerHTML={{ __html: post.acf.additional_info }}
                 />
             </div>

@@ -49,7 +49,7 @@ export default function Donation() {
           });
 
           try {
-              const response = await fetch(`ttp://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/project/${id}`, {
+              const response = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/project/${id}`, {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json',
