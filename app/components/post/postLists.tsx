@@ -36,7 +36,7 @@ const PostLists = ({token}: Props) => {
         setEditPostModalOpen(!editPostModalOpen);
     }
 
-    const getStatusColor = (status) => {
+    const getStatusColor = (status: string) => {
         switch (status) {
             case 'publish': return 'bg-green-500';
             case 'draft': return 'bg-yellow-500';
