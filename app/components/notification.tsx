@@ -51,7 +51,7 @@ const Notification = ({ isOpen, onClose, drafts, onApprove, onReject }: Props) =
                                         {onReject && (
                                             <button
                                                 onClick={() => onReject(alumni.id)}
-                                                className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-shadow shadow-sm cursor-pointer"
+                                                className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-shadow shadow-sm cursor-pointer"
                                             >
                                                 Reject
                                             </button>
