@@ -20,7 +20,7 @@ export default function Donation() {
 
   const openAddDonationModal = () => setAddDonationModalOpen(!addDonationModalOpen);
 
-  const getFeaturedImageUrl = (project) => {
+  const getFeaturedImageUrl = (project: any) => {
       if (project._embedded && project._embedded['wp:featuredmedia']) {
           return project._embedded['wp:featuredmedia'][0]?.source_url;
       }
