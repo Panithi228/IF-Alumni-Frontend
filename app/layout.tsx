@@ -38,7 +38,7 @@ export default function RootLayout({
 
         {/* Footer */}
         <footer className="bg-gray-800 text-white p-4 mt-auto text-center">
-          <p>Just in case we need to use footer.</p>
+          {/* <p>Just in case we need to use footer.</p> */}
         </footer>
       </body>
     </html>

@@ -118,15 +118,15 @@ export default function SummaryPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
                     <p className="text-sm text-gray-500 mb-1">ยอดบริจาคทั้งหมด</p>
-                    <p className="text-3xl font-bold text-indigo-700">฿{totalAmount.toLocaleString()}</p>
+                    <p className="text-3xl font-bold text-blue-700">฿{totalAmount.toLocaleString()}</p>
                 </div>
                 <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
                     <p className="text-sm text-gray-500 mb-1">จำนวนผู้บริจาค</p>
-                    <p className="text-3xl font-bold text-indigo-700">{uniqueDonors} <span className="text-lg font-normal text-gray-500">คน</span></p>
+                    <p className="text-3xl font-bold text-blue-700">{uniqueDonors} <span className="text-lg font-normal text-gray-500">คน</span></p>
                 </div>
                 <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
                     <p className="text-sm text-gray-500 mb-1">จำนวนครั้งที่บริจาค</p>
-                    <p className="text-3xl font-bold text-indigo-700">{totalCount} <span className="text-lg font-normal text-gray-500">ครั้ง</span></p>
+                    <p className="text-3xl font-bold text-blue-700">{totalCount} <span className="text-lg font-normal text-gray-500">ครั้ง</span></p>
                 </div>
             </div>
 
@@ -142,7 +142,7 @@ export default function SummaryPage() {
                             formatter={(value: number) => [`฿${value.toLocaleString()}`, 'ยอดบริจาค']}
                             contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                         />
-                        <Bar dataKey="amount" fill="#4f46e5" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="amount" fill="#0D47A1" radius={[4, 4, 0, 0]} />
                     </BarChart>
                 </ResponsiveContainer>
             </div>
@@ -152,7 +152,7 @@ export default function SummaryPage() {
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="bg-indigo-700 text-white">
+                            <tr className="bg-blue-900 text-white">
                                 <th className="px-4 py-3 text-center font-semibold w-12">No.</th>
                                 <th className="px-4 py-3 text-left font-semibold">วันที่</th>
                                 <th className="px-4 py-3 text-left font-semibold">ผู้บริจาค</th>
@@ -167,7 +167,7 @@ export default function SummaryPage() {
                                 <tr>
                                     <td colSpan={7} className="text-center py-12 text-gray-400">
                                         <div className="flex justify-center">
-                                            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+                                            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
                                         </div>
                                     </td>
                                 </tr>
@@ -182,7 +182,7 @@ export default function SummaryPage() {
                                         {new Date(d.date).toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' })}
                                     </td>
                                     <td className="px-4 py-3 font-medium text-gray-800">{d.acf?.full_name || '-'}</td>
-                                    <td className="px-4 py-3 text-right font-semibold text-indigo-700">
+                                    <td className="px-4 py-3 text-right font-semibold text-blue-800">
                                         {Number(d.acf?.donation_amount || 0).toLocaleString()}
                                     </td>
                                     <td className="px-4 py-3 text-gray-600">
@@ -192,7 +192,7 @@ export default function SummaryPage() {
                                     <td className="px-4 py-3 text-center">
                                         <button
                                             onClick={() => alert(`Post ID: ${d.id}`)}
-                                            className="bg-indigo-600 hover:bg-indigo-700 text-white w-8 h-8 rounded-full flex items-center justify-center mx-auto transition-colors cursor-pointer"
+                                            className="bg-blue-600 hover:bg-blue-700 text-white w-8 h-8 rounded-full flex items-center justify-center mx-auto transition-colors cursor-pointer"
                                         >
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

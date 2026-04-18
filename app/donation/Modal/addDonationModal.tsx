@@ -21,56 +21,61 @@ const AddDonationModal = ({ handleCloseEvent, fetchDataEvent}: Props) => {
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        if(isSubmitting) return;
+        if (isSubmitting) return;
         setIsSubmitting(true);
 
         if (!projectName || !projectInfo || !taxDeduction) {
             Swal.fire('กรุณากรอกข้อมูลให้ครบถ้วน', '', 'warning');
+            setIsSubmitting(false);
             return;
         }
 
         try {
-            const formData = new FormData();
             const token = localStorage.getItem('jwtToken');
             let uploadedImageId = null;
 
-            formData.append('title', projectName);
-            formData.append('status', 'publish');
-
             if (featuredImage) {
                 const imageFormData = new FormData();
-                imageFormData.append('file', featuredImage);
+                imageFormData.append('file', featuredImage, featuredImage.name);
                 imageFormData.append('title', projectName);
 
-                const imgResponse = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/media`, {
+                const imgResponse = await fetch(`${API_BASE_URL}/media`, {
                     method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: imageFormData
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Disposition': `attachment; filename="${featuredImage.name}"`,
+                    },
+                    body: imageFormData,
                 });
 
                 if (imgResponse.ok) {
                     const imgData = await imgResponse.json();
                     uploadedImageId = imgData.id;
+                } else {
+                    console.warn('Image upload failed:', await imgResponse.text());
                 }
             }
 
-            formData.append('featured_media', uploadedImageId)
-            formData.append('acf[project_name]', projectName)
-            formData.append('acf[project_info]', projectInfo)
-            formData.append('acf[tax_deduction]', taxDeduction)
+            const formData = new FormData();
+            formData.append('title', projectName);
+            formData.append('status', 'publish');
+            formData.append('acf[project_name]', projectName);
+            formData.append('acf[project_info]', projectInfo);
+            formData.append('acf[tax_deduction]', taxDeduction);
+
+            if (uploadedImageId) {
+                formData.append('featured_media', String(uploadedImageId));
+            }
 
             const response = await fetch(`${API_BASE_URL}/project`, {
                 method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + window.localStorage.getItem('jwtToken')
-                },
-                body: formData
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData,
             });
 
             if (response.ok) {
                 const data = await response.json();
-                console.log('Successfully submitted: ', data);
-
+                console.log('Successfully submitted:', data);
                 await Swal.fire({
                     icon: 'success',
                     title: 'ส่งข้อมูลสำเร็จ',
@@ -83,12 +88,12 @@ const AddDonationModal = ({ handleCloseEvent, fetchDataEvent}: Props) => {
                 throw new Error(errorData.message || 'Submission failed');
             }
         } catch (error: any) {
-            console.log('Error: ', error);
+            console.error('Error:', error);
             Swal.fire('Error', error.message || 'ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง', 'error');
         } finally {
             setIsSubmitting(false);
         }
-    }
+    };
 
     const handleClick = () => {
         fileInputRef.current.click();
