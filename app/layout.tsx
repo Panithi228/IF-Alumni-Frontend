@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
+import Header from "./components/header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +29,18 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {/* Header */}
+        <Header />
+
+        {/* content */}
+        {children}
+
+        {/* Footer */}
+        <footer className="bg-gray-800 text-white p-4 mt-auto text-center">
+          {/* <p>Just in case we need to use footer.</p> */}
+        </footer>
+      </body>
     </html>
   );
 }
