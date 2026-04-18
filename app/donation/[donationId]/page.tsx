@@ -30,7 +30,7 @@ export default function DonationId() {
 
     const DEFAULT_IMAGE = 'http://dekdee2.informatics.buu.ac.th:8041/wp-content/uploads/2026/04/user-icon-fake-photo-sign-profile-button-simple-style-social-media-poster-background-symbol-user-brand-logo-design-element-user-t-shirt-printing-for-sticker-free-vector.jpg';
 
-    const getFeaturedImageUrl = (project) => {
+    const getFeaturedImageUrl = (project: any) => {
         if (project._embedded && project._embedded['wp:featuredmedia']) {
             return project._embedded['wp:featuredmedia'][0].source_url;
         }
