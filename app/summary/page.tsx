@@ -157,6 +157,7 @@ export default function SummaryPage() {
     const [totalPages, setTotalPages] = useState(1);
     const [exporting, setExporting] = useState(false);
     const [selectedDonation, setSelectedDonation] = useState<any | null>(null);
+    const [selectedYear, setSelectedYear] = useState('');
     const PER_PAGE = 10;
 
     useEffect(() => {
@@ -195,14 +196,17 @@ export default function SummaryPage() {
     };
 
     const filteredDonations = donations.filter(d => {
+        const date = new Date(d.date);
+
         const matchProject = !selectedProject || String(d.acf?.project_id) === selectedProject;
         const matchMonth = !selectedMonth || new Date(d.date).getMonth() + 1 === Number(selectedMonth);
-        return matchProject && matchMonth;
+        const matchYear = !selectedYear || date.getFullYear() === Number(selectedYear);
+        return matchProject && matchMonth && matchYear;
     });
 
     useEffect(() => {
         fetchDonations(1);
-    }, [selectedProject, selectedMonth]);
+    }, [selectedProject, selectedMonth, selectedYear]);
 
     const totalAmount = filteredDonations.reduce((sum, d) => sum + Number(d.acf?.donation_amount || 0), 0);
     const uniqueDonors = new Set(filteredDonations.map(d => d.acf?.full_name)).size;
@@ -211,7 +215,11 @@ export default function SummaryPage() {
     const chartData = MONTHS.map((m, i) => ({
         name: MONTHS_TH[i],
         amount: donations
-            .filter(d => new Date(d.date).getMonth() === i)
+            .filter(d => {
+                const date = new Date(d.date);
+                const matchYear = !selectedYear || date.getFullYear() === Number(selectedYear);
+                return date.getMonth() === i && matchYear;
+            })
             .reduce((sum, d) => sum + Number(d.acf?.donation_amount || 0), 0)
     }));
 
@@ -241,8 +249,11 @@ export default function SummaryPage() {
 
             // กรองตาม filter ที่เลือก
             const exportData = allDonations.filter(d => {
+                const date = new Date(d.date);
+                
                 const matchProject = !selectedProject || String(d.acf?.project_id) === selectedProject;
                 const matchMonth = !selectedMonth || new Date(d.date).getMonth() + 1 === Number(selectedMonth);
+                const matchYear = !selectedYear || date.getFullYear() === Number(selectedYear);
                 return matchProject && matchMonth;
             });
 
@@ -358,7 +369,8 @@ export default function SummaryPage() {
 
             const projectLabel = selectedProject ? `_${projectMap[selectedProject] || selectedProject}` : '';
             const monthLabel = selectedMonth ? `_${MONTHS_TH[Number(selectedMonth) - 1]}` : '';
-            const filename = `donation_report${projectLabel}${monthLabel}_${new Date().toLocaleDateString('th-TH').replace(/\//g, '-')}.xlsx`;
+            const yearLabel = selectedYear ? `_${Number(selectedYear) + 543}` : '';
+            const filename = `donation_report${projectLabel}${monthLabel}${yearLabel}_${new Date().toLocaleDateString('th-TH').replace(/\//g, '-')}.xlsx`;
             XLSX.writeFile(wb, filename);
         } catch (e) {
             console.error('Export failed:', e);
@@ -405,6 +417,22 @@ export default function SummaryPage() {
                     {MONTHS_TH.map((m, i) => (
                         <option key={i} value={String(i + 1).padStart(2, '0')}>{m}</option>
                     ))}
+                </select>
+
+                <select
+                    value={selectedYear}
+                    onChange={e => { setSelectedYear(e.target.value); setCurrentPage(1); }}
+                    className="border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 min-w-[120px]"
+                >
+                    <option value="">เลือกปี</option>
+                    {[...Array(5)].map((_, i) => {
+                        const year = new Date().getFullYear() - i;
+                        return (
+                            <option key={year} value={year}>
+                                {year + 543}
+                            </option>
+                        );
+                    })}
                 </select>
 
                 <button
