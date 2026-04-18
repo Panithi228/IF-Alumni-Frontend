@@ -481,7 +481,7 @@ export default function SummaryPage() {
                         <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
                         <YAxis tick={{ fontSize: 12, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
                         <Tooltip
-                            formatter={(value: number) => [`฿${value.toLocaleString()}`, 'ยอดบริจาค']}
+                            formatter={(value) => [`฿${Number(value).toLocaleString()}`, 'ยอดบริจาค']}
                             contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                         />
                         <Bar dataKey="amount" fill="#0D47A1" radius={[4, 4, 0, 0]} />
