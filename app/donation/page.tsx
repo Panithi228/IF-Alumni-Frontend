@@ -145,7 +145,7 @@ export default function Donation() {
       const totalPages = Number(response.headers.get('X-WP-TotalPages'));
       const data = await response.json();
 
-      setProjectLists(prev =>
+      setProjectLists((prev: any) =>
         reset || pageNum === 1 ? data : [...prev, ...data]
       );
 
