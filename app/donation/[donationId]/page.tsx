@@ -507,7 +507,7 @@ export default function DonationId() {
         </h2>
 
         <div className="flex justify-center mb-5">
-          <div className="bg-gradient-to-r from-sky-100 to-indigo-100 p-5 rounded-xl shadow-sm">
+          <div className="bg-gradient-to-r from-sky-500 to-indigo-400 p-5 rounded-xl shadow-sm">
             <img src="/images/ktb-logo.png" alt="ktb-logo" className="h-12" />
           </div>
         </div>
