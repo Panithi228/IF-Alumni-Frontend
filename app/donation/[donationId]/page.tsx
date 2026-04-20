@@ -129,9 +129,16 @@ export default function DonationId() {
                 <h1 className="text-3xl font-bold text-gray-900 leading-tight">
                     {project.acf.project_name}
                 </h1>
+                {project.acf.tax_deduction = 1 && (
                 <span className='text-red-500 text-lg font-bold'>
-                    สามารถลดหย่อนภาษีได้ {project.acf.tax_deduction} เท่า
+                    ลดหย่อนภาษีตามจริง
                 </span>
+                )}
+                {project.acf.tax_deduction > 1 && (
+                <span className='text-red-500 text-lg font-bold'>
+                    ลดหย่อนภาษี {project.acf.tax_deduction} เท่า
+                </span>
+                )}
             </div>
 
             {/* Project Information */}
