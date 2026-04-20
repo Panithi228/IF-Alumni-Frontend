@@ -7,8 +7,7 @@ export default function AboutId({ params }: { params: Promise<{ aboutId: string 
     const resolvedParams = use(params);
     const aboutId = resolvedParams.aboutId;
     const [editPostModalOpen, setEditPostModalOpen] = useState(false);
-    const [selectedPostId, setSelectedPostId] = useState(null); 
-
+    const [selectedPostId, setSelectedPostId] = useState(null);
     const [post, setPost] = useState<any>(null);
 
     const DEFAULT_IMAGE = 'http://dekdee2.informatics.buu.ac.th:8041/wp-content/uploads/2026/04/user-icon-fake-photo-sign-profile-button-simple-style-social-media-poster-background-symbol-user-brand-logo-design-element-user-t-shirt-printing-for-sticker-free-vector.jpg';
@@ -23,7 +22,7 @@ export default function AboutId({ params }: { params: Promise<{ aboutId: string 
     const openEditPostModal = (id = null) => {
         setSelectedPostId(id);
         setEditPostModalOpen(!editPostModalOpen);
-    }
+    };
 
     const MAJOR_MAP: Record<string, string> = {
         'CS': 'สาขาวิชาวิทยาการคอมพิวเตอร์',
@@ -35,15 +34,10 @@ export default function AboutId({ params }: { params: Promise<{ aboutId: string 
     const fetchPost = async () => {
         try {
             const token = window.localStorage.getItem('jwtToken');
-
-            const res = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/alumni/${aboutId}?_embed`,{
-                    headers: token
-                        ? { 
-                        Authorization: 'Bearer ' + token 
-                        } : {}
-                }
+            const res = await fetch(
+                `http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/alumni/${aboutId}?_embed`,
+                { headers: token ? { Authorization: 'Bearer ' + token } : {} }
             );
-
             const data = await res.json();
             setPost(data);
         } catch (err) {
@@ -56,67 +50,120 @@ export default function AboutId({ params }: { params: Promise<{ aboutId: string 
     }, [aboutId]);
 
     if (!post) {
-        return <div className="text-center py-20">Loading...</div>;
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-[#1565C0] text-lg font-medium animate-pulse">กำลังโหลด...</div>
+            </div>
+        );
     }
 
     return (
-        <div className="flex flex-col max-w bg-gray-50 min-h-full">
-            {/* Profile */}
-            <div className=" p-10 flex align-items-center justify-center">
-                <img 
-                    src={getImage(post)}
-                    className="w-80 h-80 object-cover rounded border"
-                />
+        <div className="flex flex-col bg-gray-50 min-h-screen px-8 py-8 gap-5 w-full">
 
-                <div className="flex flex-col gap-10 ml-50">
-                    <h2 className="text-3xl font-bold " dangerouslySetInnerHTML={{ __html: post.title.rendered }} />
+            {/* ── Profile Card ── */}
+            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
 
-                    <p className="text-2xl  font-medium">คณะวิทยาการสารสนเทศ {MAJOR_MAP[post.acf.major] || post.acf.major}</p>
-                    <p className="text-2xl  font-medium">ปีการศึกษา {post.acf?.graduation_year}</p>
-                    {/* <p>ระดับการศึกษา {post.acf?.degree}</p> */}
-                    <p className="text-2xl  font-medium">ตำแหน่งงาน {post.acf?.job_position}</p>
-                    <p className="text-2xl  font-medium">สถานที่ทำงาน {post.acf?.workplace}</p>
+                {/* Banner */}
+                <div className="h-36 bg-[#0D2B5E] relative">
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#F9C900]" />
+                </div>
 
-                    {/* 👇 status badge */}
-                    {/* <span className={`inline-block mt-2 px-2 py-1 text-xs text-white rounded ${
-                        post.status === 'publish'
-                            ? 'bg-green-500'
-                            : post.status === 'draft'
-                            ? 'bg-yellow-500'
-                            : 'bg-gray-500'
-                    }`}>
-                        {post.status}
-                    </span> */}
+                {/* Avatar + Name row */}
+                <div className="px-8 flex items-end gap-6 -mt-20 relative">
+                    {/* Avatar */}
+                    <div className="w-40 h-40 rounded-full border-4 border-white ring-2 ring-[#1565C0] overflow-hidden bg-gray-200 flex-shrink-0">
+                        <img
+                            src={getImage(post)}
+                            alt="profile"
+                            className="w-full h-full object-cover object-top"
+                        />
+                    </div>
+
+                    {/* Name + badges */}
+                    <div className="pb-3">
+                        <h2
+                            className="text-2xl font-medium text-gray-900"
+                            dangerouslySetInnerHTML={{ __html: post.title.rendered }}
+                        />
+                        <div className="flex items-center gap-2 mt-2 flex-wrap">
+                            <span className="inline-flex items-center gap-1.5 bg-blue-50 text-[#0C447C] text-xs font-medium px-3 py-1 rounded-full">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#1565C0]" />
+                                {post.acf?.job_position}
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 bg-blue-50 text-[#0C447C] text-xs font-medium px-3 py-1 rounded-full">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#1565C0]" />
+                                {post.acf?.workplace}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="h-px bg-gray-100 mx-6 my-4" />
+
+                {/* Info section */}
+                <div className="px-6 pb-5">
+                    <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-3 flex items-center gap-2 after:flex-1 after:h-px after:bg-gray-100">
+                        ข้อมูลการศึกษา
+                    </p>
+
+                    <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-3 mb-3">
+                        <div className="w-8 h-8 rounded-lg bg-[#1565C0] flex items-center justify-center flex-shrink-0">
+                            <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24">
+                                <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm-7 8.22V15l7 3.83L19 15v-3.78l-7 3.83-7-3.83z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-800 leading-tight">คณะวิทยาการสารสนเทศ</p>
+                            <p className="text-xs text-gray-500 mt-0.5">{MAJOR_MAP[post.acf?.major] || post.acf?.major}</p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2">
+                        {[
+                            { label: 'ปีการศึกษา', value: post.acf?.graduation_year },
+                            { label: 'ตำแหน่ง', value: post.acf?.job_position },
+                            { label: 'บริษัท', value: post.acf?.workplace },
+                        ].map(({ label, value }) => (
+                            <div key={label} className="bg-gray-50 rounded-xl p-3">
+                                <p className="text-[10px] uppercase tracking-wide text-gray-400 mb-1">{label}</p>
+                                <p className="text-sm font-medium text-gray-800 truncate">{value}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
 
-            {/* Content */}
-            <div className="bg-white rounded-xl mx-10 leading-loose min-h-100 border border-[#dde5f0] shadow-lg">
-                <div className="bg-white border-b border-[#dde5f0] rounded-xl overflow-hidden">
+            {/* ── Content / Blog Card ── */}
+            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                <div className="h-1 bg-[#F9C900]" />
+
+                <div className="border-b border-gray-100 px-6 py-4">
                     <h2
-                        className="text-6xl font-bold mb-4 m-2"
+                        className="text-2xl font-medium text-gray-900"
                         dangerouslySetInnerHTML={{ __html: post.title.rendered }}
                     />
                 </div>
 
                 <div
-                    className="px-6 py-5 text-[18px] leading-loose text-[#4A5F7A] whitespace-pre-line break-words"
-                    dangerouslySetInnerHTML={{ __html: post.acf.additional_info }}
+                    className="px-6 py-5 text-[15px] leading-loose text-[#4A5F7A] whitespace-pre-line break-words"
+                    dangerouslySetInnerHTML={{ __html: post.acf?.additional_info }}
                 />
             </div>
 
-            <div className="flex bg-gray-50 justify-end p-6 mt-9">
-                <button 
+            {/* ── Edit Button ── */}
+            <div className="flex justify-end">
+                <button
                     onClick={() => openEditPostModal(post.id)}
-                    className="bg-amber-100 hover:bg-amber-200 text-amber-700 text-md font-semibold py-3 px-20 rounded-lg transition-colors border border-amber-400 cursor-pointer"
+                    className="bg-amber-50 hover:bg-amber-100 text-amber-700 text-sm font-semibold py-2.5 px-10 rounded-xl transition-colors border border-amber-300 cursor-pointer"
                 >
                     Edit
                 </button>
             </div>
+
             {editPostModalOpen && (
-                <EditPostModal 
+                <EditPostModal
                     postId={selectedPostId}
-                    handleCloseEvent={() => openEditPostModal(null)} 
+                    handleCloseEvent={() => openEditPostModal(null)}
                     fetchDataEvent={fetchPost}
                 />
             )}
