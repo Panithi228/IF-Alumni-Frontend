@@ -316,7 +316,7 @@ const PostLists = ({token}: Props) => {
                     <div className="text-[#1565C0] text-base font-medium animate-pulse">กำลังโหลด...</div>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                     {filteredAlumni.length > 0 ? filteredAlumni.map((post) => (
                         <div key={post.id} className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group">
 
@@ -324,7 +324,7 @@ const PostLists = ({token}: Props) => {
                             <div className="h-1 bg-[#F9C900]" />
 
                             {/* Image */}
-                            <div className="h-52 bg-gray-100 overflow-hidden relative">
+                            <div className="h-70 bg-gray-100 overflow-hidden relative">
                                 <img
                                     src={getFeaturedImageUrl(post)}
                                     alt={post.title.rendered}
