@@ -27,7 +27,7 @@ const PostLists = ({token}: Props) => {
     const [selectedMajor, setSelectedMajor] = useState('ทั้งหมด');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
-    const DEFAULT_IMAGE = 'http://dekdee2.informatics.buu.ac.th:8041/wp-content/uploads/2026/04/user-icon-fake-photo-sign-profile-button-simple-style-social-media-poster-background-symbol-user-brand-logo-design-element-user-t-shirt-printing-for-sticker-free-vector.jpg';
+    const DEFAULT_IMAGE = `http://localhost:8041/wp-content/uploads/2026/04/user-icon-fake-photo-sign-profile-button-simple-style-social-media-poster-background-symbol-user-brand-logo-design-element-user-t-shirt-printing-for-sticker-free-vector.jpg`;
 
     const openAddPostModal = () => setAddPostModalOpen(!addPostModalOpen);
     
@@ -59,8 +59,8 @@ const PostLists = ({token}: Props) => {
 
         try {
             const url = activeToken
-                ? `http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/alumni?status=publish,pending,draft&per_page=100&page=${pageNum}&_embed`
-                : `http://dekdee2.informatics.buu.ac.th:8041/wp-json/alumni-api/v1/alumni-all?per_page=100&page=${pageNum}&_embed`;
+                ? `${process.env.NEXT_PUBLIC_API_URL}/wp-json/wp/v2/alumni?status=publish,pending,draft&per_page=100&page=${pageNum}&_embed`
+                : `${process.env.NEXT_PUBLIC_API_URL}/wp-json/alumni-api/v1/alumni-all?per_page=100&page=${pageNum}&_embed`;
 
             const response = await fetch(url, {
                 headers: activeToken ? { Authorization: 'Bearer ' + activeToken } : {}
@@ -103,7 +103,7 @@ const PostLists = ({token}: Props) => {
         if (result.isConfirmed) {
             Swal.fire({ title: 'กำลังดำเนินการ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
             try {
-                const response = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/alumni/${id}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wp-json/wp/v2/alumni/${id}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.localStorage.getItem('jwtToken') },
                     body: JSON.stringify({ status: 'publish' })
@@ -133,7 +133,7 @@ const PostLists = ({token}: Props) => {
         if (result.isConfirmed) {
             Swal.fire({ title: 'กำลังดำเนินการ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
             try {
-                const response = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/alumni/${id}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wp-json/wp/v2/alumni/${id}`, {
                     method: 'DELETE',
                     headers: { 'Authorization': 'Bearer ' + window.localStorage.getItem('jwtToken') }
                 });
@@ -162,7 +162,7 @@ const PostLists = ({token}: Props) => {
         if (result.isConfirmed) {
             Swal.fire({ title: 'กำลังดำเนินการ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
             try {
-                const response = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/alumni/${id}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wp-json/wp/v2/alumni/${id}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.localStorage.getItem('jwtToken') },
                     body: JSON.stringify({ status: 'draft' })
@@ -192,7 +192,7 @@ const PostLists = ({token}: Props) => {
         if (result.isConfirmed) {
             Swal.fire({ title: 'กำลังดำเนินการ...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
             try {
-                const response = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/alumni/${id}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wp-json/wp/v2/alumni/${id}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.localStorage.getItem('jwtToken') },
                     body: JSON.stringify({ status: 'publish' })

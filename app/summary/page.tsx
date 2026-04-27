@@ -30,7 +30,7 @@ function DonationDetailModal({
         const receiptId = donation.acf?.donation_receipt;
         if (!receiptId) return;
 
-        fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/media/${receiptId}`, {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/wp-json/wp/v2/media/${receiptId}`, {
             headers: { Authorization: 'Bearer ' + window.localStorage.getItem('jwtToken') }
         })
             .then(res => res.json())
@@ -163,7 +163,7 @@ export default function SummaryPage() {
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const res = await fetch('http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/project?per_page=100&status=any&_embed', {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wp-json/wp/v2/project?per_page=100&status=any&_embed`, {
                     headers: { Authorization: 'Bearer ' + window.localStorage.getItem('jwtToken') }
                 });
 
@@ -179,7 +179,7 @@ export default function SummaryPage() {
     const fetchDonations = async (page = 1) => {
         setLoading(true);
         try {
-            const url = `http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/donation?per_page=${PER_PAGE}&page=${page}&_embed&orderby=date&order=desc`;
+            const url = `${process.env.NEXT_PUBLIC_API_URL}/wp-json/wp/v2/donation?per_page=${PER_PAGE}&page=${page}&_embed&orderby=date&order=desc`;
             const res = await fetch(url, {
                 headers: { Authorization: 'Bearer ' + window.localStorage.getItem('jwtToken') }
             });
@@ -237,7 +237,7 @@ export default function SummaryPage() {
             let total = 1;
 
             do {
-                const url = `http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/donation?per_page=100&page=${page}&_embed&orderby=date&order=desc`;
+                const url = `${process.env.NEXT_PUBLIC_API_URL}/wp-json/wp/v2/donation?per_page=100&page=${page}&_embed&orderby=date&order=desc`;
                 const res = await fetch(url, {
                     headers: { Authorization: 'Bearer ' + window.localStorage.getItem('jwtToken') }
                 });
@@ -265,7 +265,7 @@ export default function SummaryPage() {
                     if (!receiptId) return;
                     try {
                         const res = await fetch(
-                            `http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/media/${receiptId}`,
+                            `${process.env.NEXT_PUBLIC_API_URL}/wp-json/wp/v2/media/${receiptId}`,
                             { headers: { Authorization: 'Bearer ' + window.localStorage.getItem('jwtToken') } }
                         );
                         const media = await res.json();

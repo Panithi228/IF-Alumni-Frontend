@@ -10,7 +10,7 @@ export default function AboutId({ params }: { params: Promise<{ aboutId: string 
     const [selectedPostId, setSelectedPostId] = useState(null);
     const [post, setPost] = useState<any>(null);
 
-    const DEFAULT_IMAGE = 'http://dekdee2.informatics.buu.ac.th:8041/wp-content/uploads/2026/04/user-icon-fake-photo-sign-profile-button-simple-style-social-media-poster-background-symbol-user-brand-logo-design-element-user-t-shirt-printing-for-sticker-free-vector.jpg';
+    const DEFAULT_IMAGE = `http://localhost:8041/wp-content/uploads/2026/04/user-icon-fake-photo-sign-profile-button-simple-style-social-media-poster-background-symbol-user-brand-logo-design-element-user-t-shirt-printing-for-sticker-free-vector.jpg`;
 
     const getImage = (post: any) => {
         if (post?._embedded?.['wp:featuredmedia']) {
@@ -35,7 +35,7 @@ export default function AboutId({ params }: { params: Promise<{ aboutId: string 
         try {
             const token = window.localStorage.getItem('jwtToken');
             const res = await fetch(
-                `http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/alumni/${aboutId}?_embed`,
+                `${process.env.NEXT_PUBLIC_API_URL}/wp-json/wp/v2/alumni/${aboutId}?_embed`,
                 { headers: token ? { Authorization: 'Bearer ' + token } : {} }
             );
             const data = await res.json();

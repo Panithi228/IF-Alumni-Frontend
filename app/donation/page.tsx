@@ -16,7 +16,7 @@ export default function Donation() {
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
 
-  const DEFAULT_IMAGE = 'http://dekdee2.informatics.buu.ac.th:8041/wp-content/uploads/2026/04/user-icon-fake-photo-sign-profile-button-simple-style-social-media-poster-background-symbol-user-brand-logo-design-element-user-t-shirt-printing-for-sticker-free-vector.jpg';
+  const DEFAULT_IMAGE = `http://localhost:8041/wp-content/uploads/2026/04/user-icon-fake-photo-sign-profile-button-simple-style-social-media-poster-background-symbol-user-brand-logo-design-element-user-t-shirt-printing-for-sticker-free-vector.jpg`;
 
   const openAddDonationModal = () => setAddDonationModalOpen(!addDonationModalOpen);
 
@@ -49,7 +49,7 @@ export default function Donation() {
           });
 
           try {
-              const response = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/project/${id}`, {
+              const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wp-json/wp/v2/project/${id}`, {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json',
@@ -97,7 +97,7 @@ export default function Donation() {
           });
 
           try {
-              const response = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/project/${id}`, {
+              const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wp-json/wp/v2/project/${id}`, {
                   method: 'POST',
                   headers: {
                       'Content-Type': 'application/json',
@@ -131,8 +131,8 @@ export default function Donation() {
 
     try {
       const url = activeToken
-        ? `http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/project?status=publish,pending,draft&per_page=9&page=${pageNum}&_embed`
-        : `http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/project?status=publish&per_page=9&page=${pageNum}&_embed`;
+        ? `${process.env.NEXT_PUBLIC_API_URL}/wp-json/wp/v2/project?status=publish,pending,draft&per_page=9&page=${pageNum}&_embed`
+        : `${process.env.NEXT_PUBLIC_API_URL}/wp-json/wp/v2/project?status=publish&per_page=9&page=${pageNum}&_embed`;
 
       const response = await fetch(url, {
         headers: activeToken

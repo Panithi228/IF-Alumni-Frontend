@@ -28,7 +28,7 @@ export default function DonationId() {
     const [submitted, setSubmitted] = useState(false);
     const [today, setToday] = useState('');
 
-    const DEFAULT_IMAGE = 'http://dekdee2.informatics.buu.ac.th:8041/wp-content/uploads/2026/04/user-icon-fake-photo-sign-profile-button-simple-style-social-media-poster-background-symbol-user-brand-logo-design-element-user-t-shirt-printing-for-sticker-free-vector.jpg';
+    const DEFAULT_IMAGE = `http://localhost:8041/wp-content/uploads/2026/04/user-icon-fake-photo-sign-profile-button-simple-style-social-media-poster-background-symbol-user-brand-logo-design-element-user-t-shirt-printing-for-sticker-free-vector.jpg`;
 
     const getFeaturedImageUrl = (project: any) => {
         if (project._embedded && project._embedded['wp:featuredmedia']) {
@@ -67,7 +67,7 @@ export default function DonationId() {
                 formData.append('donation_receipt', donationReceipt);
             }
 
-            const res = await fetch('http://dekdee2.informatics.buu.ac.th:8041/wp-json/alumni-api/v1/donation', {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wp-json/alumni-api/v1/donation`, {
                 method: 'POST',
                 body: formData,
             });
@@ -87,7 +87,7 @@ export default function DonationId() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2/project/${donationId}?_embed`);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wp-json/wp/v2/project/${donationId}?_embed`);
                 const data = await response.json();
                 setProject(data);
             } catch (error) {

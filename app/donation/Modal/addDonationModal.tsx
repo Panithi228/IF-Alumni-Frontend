@@ -17,7 +17,7 @@ const AddDonationModal = ({ handleCloseEvent, fetchDataEvent}: Props) => {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const API_BASE_URL = 'http://dekdee2.informatics.buu.ac.th:8041/wp-json/wp/v2'
+    const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}/wp-json/wp/v2`
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();

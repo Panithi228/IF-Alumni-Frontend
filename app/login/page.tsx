@@ -16,7 +16,7 @@ const Login = ({ onLogin }: { onLogin: (token: string) => void }) => {
     setLoading(true);
 
     try {
-      const res = await fetch('http://dekdee2.informatics.buu.ac.th:8041/wp-json/jwt-auth/v1/token', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wp-json/jwt-auth/v1/token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
