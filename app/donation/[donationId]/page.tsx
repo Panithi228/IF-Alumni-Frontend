@@ -126,12 +126,19 @@ export default function DonationId() {
                 alt=""
             />
             <div className="px-2 border-b border-gray-400 pb-2">
-                <h1 className="text-5xl font-bold text-gray-900 leading-tight">
+                <h1 className="text-3xl font-bold text-gray-900 leading-tight">
                     {project.acf.project_name}
                 </h1>
+                {project.acf.tax_deduction = 1 && (
                 <span className='text-red-500 text-lg font-bold'>
-                    สามารถลดหย่อนภาษีได้ {project.acf.tax_deduction} เท่า
+                    ลดหย่อนภาษีตามจริง
                 </span>
+                )}
+                {project.acf.tax_deduction > 1 && (
+                <span className='text-red-500 text-lg font-bold'>
+                    ลดหย่อนภาษี {project.acf.tax_deduction} เท่า
+                </span>
+                )}
             </div>
 
             {/* Project Information */}
@@ -488,281 +495,293 @@ export default function DonationId() {
 
             {/* Step 3 Form */}
             {step === 3 && paymentMethod === 'bank' && (
-                <div className='ml-6'>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className='bg-white p-3 rounded-xl'>
-                            <div className="flex-1 justify-center bg-indigo-900 w-full p-3 mb-5 rounded-xl">
-                                <p className='text-white text-xl font-bold text-center'>บริจาคผ่านบัญชีธนาคาร</p>
-                            </div>
+  <div className="ml-6 max-w-4xl mx-auto">
 
-                            <div className='flex justify-center items-center bg-sky-500 w-full p-5 mb-3 rounded-xl'>
-                                <img src="/images/ktb-logo.png" alt="ktb-logo" />
-                            </div>
+    <div className="space-y-6">
 
-                            <div className='my-2 p-2 border-b border-gray-300'>
-                                <label className='text-lg font-bold'>ธนาคารกรุงไทย</label>
-                            </div>
+      {/* ================= BANK INFO ================= */}
+      <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
 
-                            <div className='flex p-2 my-2 justify-between'>
-                                <div>
-                                    <label className='text-lg'>ชื่อบัญชี</label>
-                                </div>
-                                <div>
-                                    <label className='text-lg'>มหาวิทยาลัยบูรพา</label>
-                                </div>
-                            </div>
+        <h2 className="text-xl font-bold text-indigo-900 mb-5 flex items-center gap-2">
+        บริจาคผ่านบัญชีธนาคาร
+        </h2>
 
-                            <div className='flex p-2 my-2 justify-between'>
-                                <div>
-                                    <label className='text-lg'>เลขบัญชี</label>
-                                </div>
-                                <div>
-                                    <label className='text-lg'>3861004429</label>
-                                </div>
-                            </div>
-                        </div>
+        <div className="flex justify-center mb-5">
+          <div className="bg-gradient-to-r from-sky-500 to-indigo-400 p-5 rounded-xl shadow-sm">
+            <img src="/images/ktb-logo.png" alt="ktb-logo" className="h-12" />
+          </div>
+        </div>
 
-                        <div className='bg-white p-3 rounded-xl'>
-                            <div className='p-2 mb-4'>
-                                <h2 className='text-xl font-bold'>รายละเอียดการบริจาค</h2>
-                            </div>
 
-                            <div className='flex p-2 justify-between'>
-                                <div>
-                                    <label className='text-lg'>เลขที่ใบเสร็จ</label>
-                                </div>
+          <div className="flex justify-between py-3">
+            <span className="text-gray-500">ธนาคาร</span>
+            <span>กรุงไทย</span>
+          </div>
 
-                                <div>
-                                    <label className='text-lg'>{receiptNo || 'จะออกหลังจากยืนยันการบริจาค'}</label>
-                                </div>
-                            </div>
+<div className="flex justify-between py-3">
+            <span className="text-gray-500">ชื่อบัญชี</span>
+            <span>มหาวิทยาลัยบูรพา</span>
+          </div>
 
-                            <div className='flex p-2 justify-between'>
-                                <div>
-                                    <label className='text-lg'>วันที่</label>
-                                </div>
+       
 
-                                <div>
-                                    <label className='text-lg'>{today || 'กำลังโหลด...'}</label>
-                                </div>
-                            </div>
 
-                            <div className='flex p-2 justify-between'>
-                                <div>
-                                    <label className='text-lg'>ชื่อผู้บริจาค</label>
-                                </div>
 
-                                <div>
-                                    <label className='text-lg'>{prefix + ' ' + fullName}</label>
-                                </div>
-                            </div>
+          <div className="flex justify-between py-3 items-center">
+            <span className="text-gray-500">เลขบัญชี</span>
+            <span className="font-mono  text-lg tracking-widest bg-gray-100 px-3 py-1 rounded-lg">
+              386-1-00442-9
+            </span>
+          </div>
 
-                            <div className='flex p-2 justify-between'>
-                                <div>
-                                    <div>
-                                        <label className='text-lg'>เลขประจำตัวผู้เสียภาษี/</label>
-                                    </div>
-                                    <label className='text-lg'>เลขประจำตัวประชาชน</label>
-                                </div>
+      </div>
 
-                                <div>
-                                    <label className='text-lg'>{taxId}</label>
-                                </div>
-                            </div>
+      {/* ================= DONATION DETAIL ================= */}
+      <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
 
-                            <div className='flex p-2 justify-between'>
-                                <div className='overflow'>
-                                    <label className='text-lg'>จำนวนเงิน</label>
-                                </div>
+        <h2 className="text-xl font-bold text-indigo-900 mb-5 flex items-center gap-2">
+        รายละเอียดการบริจาค
+        </h2>
 
-                                <div>
-                                    <label className='text-lg'>{donateAmount} บาท</label>
-                                </div>
-                            </div>
+        <div>
 
-                            <div className='flex p-2 justify-between'>
-                                <div>
-                                    <label className='text-lg'>โครงการ</label>
-                                </div>
+          <div className="flex justify-between py-3">
+            <span className="text-gray-500">เลขที่ใบเสร็จ</span>
+            <span className="text-right">
+              {receiptNo || 'จะออกหลังจากยืนยันการบริจาค'}
+            </span>
+          </div>
 
-                                <div>
-                                    <label className='text-lg'>{project.acf.project_name}</label>
-                                </div>
-                            </div>
+          <div className="flex justify-between py-3">
+            <span className="text-gray-500">วันที่</span>
+            <span>{today || 'กำลังโหลด...'}</span>
+          </div>
 
-                            <div className='flex p-2 justify-between border-b border-gray-300'>
-                                <div>
-                                    <label className='text-lg'>องค์กร</label>
-                                </div>
+          <div className="flex justify-between py-3">
+            <span className="text-gray-500">ชื่อผู้บริจาค</span>
+            <span className="text-right">
+              {prefix + ' ' + fullName}
+            </span>
+          </div>
 
-                                <div>
-                                    <label className='text-lg'>มหาวิทยาลัยบูรพา</label>
-                                </div>
-                            </div>
+          <div className="flex justify-between py-3">
+            <span className="text-gray-500">
+              เลขผู้เสียภาษี/ประชาชน
+            </span>
+            <span>{taxId}</span>
+          </div>
 
-                            <div className='p-2 mb-4'>
-                                <h2 className='text-xl font-bold'>แนบหลักฐานการโอนเงิน <span className='text-red-500 font-bold'>*</span></h2>
-                            </div>
-                            
-                            <div>
-                                <input
-                                    type="file"
-                                    className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                                    onChange={(e) => setDonationReceipt(e.target.files ? e.target.files[0] : null)}
-                                    required
-                                />
-                            </div>
-                        </div>
-                    </div>
+          <div className="flex justify-between py-3">
+            <span className="text-gray-500">โครงการ</span>
+            <span className="text-right max-w-[70%]">
+              {project.acf.project_name}
+            </span>
+          </div>
 
-                    <div className="mt-6">
-                        <button
-                            disabled={!donationReceipt}
-                            onClick={handleSubmitDonation}
-                            className={`w-full py-4 rounded-xl font-bold text-lg transition-all
-                                ${donationReceipt 
-                                    ? "bg-indigo-800 text-white hover:bg-indigo-900 shadow-lg cursor-pointer"
-                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
-                        >
-                            ยืนยันการบริจาค
-                        </button>
-                    </div>
-                </div>
-            )}
+          <div className="flex justify-between py-3">
+            <span className="text-gray-500">องค์กร</span>
+            <span>มหาวิทยาลัยบูรพา</span>
+          </div>
+
+        </div>
+
+        {/* ===== AMOUNT HIGHLIGHT ===== */}
+        <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl flex justify-between items-center">
+          <span className="text-gray-700 font-medium">
+            จำนวนเงินที่บริจาค
+          </span>
+          <span className="text-2xl font-bold text-green-600">
+            {donateAmount} บาท
+          </span>
+        </div>
+
+        {/* ===== UPLOAD ===== */}
+        <div className="mt-6">
+          <label className="block font-semibold mb-2">
+            แนบหลักฐานการโอนเงิน <span className="text-red-500">*</span>
+          </label>
+
+          <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 hover:border-indigo-400 transition">
+            <input
+              type="file"
+              className="w-full text-sm text-gray-500
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-full file:border-0
+              file:text-sm file:font-semibold
+              file:bg-indigo-50 file:text-indigo-700
+              hover:file:bg-indigo-100"
+              onChange={(e) =>
+                setDonationReceipt(
+                  e.target.files ? e.target.files[0] : null
+                )
+              }
+              required
+            />
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    {/* ================= BUTTON ================= */}
+    <div className="mt-6">
+      <button
+        disabled={!donationReceipt}
+        onClick={handleSubmitDonation}
+        className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-200
+        ${
+          donationReceipt
+            ? "bg-gradient-to-r from-indigo-700 to-indigo-900 text-white hover:scale-[1.01] shadow-lg"
+            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+        }`}
+      >
+        ยืนยันการบริจาค
+      </button>
+    </div>
+  </div>
+)}
 
             {step === 3 && paymentMethod === 'qr' && (
-                <div className='ml-6'>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className='bg-white p-3 rounded-xl'>
-                            <div className="flex-1 justify-center bg-indigo-900 w-full p-3 mb-5 rounded-xl">
-                                <p className='text-white text-xl font-bold text-center'>แสกนบริจาค</p>
-                            </div>
+  <div className="ml-6 max-w-4xl mx-auto">
 
-                            <div className='flex justify-center items-center w-full p-5 mb-3 rounded-xl'>
-                                <img src="/images/qrcode_mock.png" alt="qrcode" />
-                            </div>
+    <div className="space-y-6">
 
-                            <div className='my-2 p-2 border-b border-gray-300'>
-                                <label className='text-lg font-bold'>ธนาคารกรุงไทย</label>
-                            </div>
+      {/* ================= QR INFO ================= */}
+      <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
 
-                            <div className='flex p-2 my-2 justify-between'>
-                                <div>
-                                    <label className='text-lg'>ชื่อบัญชี</label>
-                                </div>
-                                <div>
-                                    <label className='text-lg'>มหาวิทยาลัยบูรพา</label>
-                                </div>
-                            </div>
-                        </div>
+        <h2 className="text-xl font-bold text-indigo-900 mb-5 flex items-center gap-2">
+          สแกนเพื่อบริจาค
+        </h2>
 
-                        <div className='bg-white p-3 rounded-xl'>
-                            <div className='p-2 mb-4'>
-                                <h2 className='text-xl font-bold'>รายละเอียดการบริจาค</h2>
-                            </div>
+        {/* QR */}
+        <div className="flex justify-center mb-5">
+          <div className="bg-gradient-to-r from-sky-100 to-indigo-100 p-6 rounded-2xl shadow-sm">
+            <img
+              src="/images/qrcode_mock.png"
+              alt="qrcode"
+              className="h-48 w-48 object-contain"
+            />
+          </div>
+        </div>
 
-                            <div className='flex p-2 justify-between'>
-                                <div>
-                                    <label className='text-lg'>เลขที่ใบเสร็จ</label>
-                                </div>
+        {/* Bank Info */}
+        
+          <div className="flex justify-between py-3">
+            <span className="text-gray-500">ธนาคาร</span>
+            <span>กรุงไทย</span>
+          </div>
 
-                                <div>
-                                    <label className='text-lg'>{receiptNo || 'จะออกหลังจากยืนยันการบริจาค'}</label>
-                                </div>
-                            </div>
+          <div className="flex justify-between py-3">
+            <span className="text-gray-500">ชื่อบัญชี</span>
+            <span>มหาวิทยาลัยบูรพา</span>
+          </div>
 
-                            <div className='flex p-2 justify-between'>
-                                <div>
-                                    <label className='text-lg'>วันที่</label>
-                                </div>
+      </div>
 
-                                <div>
-                                    <label className='text-lg'>{today || 'กำลังโหลด...'}</label>
-                                </div>
-                            </div>
+      {/* ================= DONATION DETAIL ================= */}
+      <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
 
-                            <div className='flex p-2 justify-between'>
-                                <div>
-                                    <label className='text-lg'>ชื่อผู้บริจาค</label>
-                                </div>
+        <h2 className="text-xl font-bold text-indigo-900 mb-5 flex items-center gap-2">
+          รายละเอียดการบริจาค
+        </h2>
 
-                                <div>
-                                    <label className='text-lg'>{prefix + ' ' + fullName}</label>
-                                </div>
-                            </div>
+        <div>
 
-                            <div className='flex p-2 justify-between'>
-                                <div>
-                                    <div>
-                                        <label className='text-lg'>เลขประจำตัวผู้เสียภาษี/</label>
-                                    </div>
-                                    <label className='text-lg'>เลขประจำตัวประชาชน</label>
-                                </div>
+          <div className="flex justify-between py-3">
+            <span className="text-gray-500">เลขที่ใบเสร็จ</span>
+            <span className="text-right">
+              {receiptNo || 'จะออกหลังจากยืนยันการบริจาค'}
+            </span>
+          </div>
 
-                                <div>
-                                    <label className='text-lg'>{taxId}</label>
-                                </div>
-                            </div>
+          <div className="flex justify-between py-3">
+            <span className="text-gray-500">วันที่</span>
+            <span>{today || 'กำลังโหลด...'}</span>
+          </div>
 
-                            <div className='flex p-2 justify-between'>
-                                <div className='overflow'>
-                                    <label className='text-lg'>จำนวนเงิน</label>
-                                </div>
+          <div className="flex justify-between py-3">
+            <span className="text-gray-500">ชื่อผู้บริจาค</span>
+            <span className="text-right">
+              {prefix + ' ' + fullName}
+            </span>
+          </div>
 
-                                <div>
-                                    <label className='text-lg'>{donateAmount} บาท</label>
-                                </div>
-                            </div>
+          <div className="flex justify-between py-3">
+            <span className="text-gray-500">
+              เลขผู้เสียภาษี/ประชาชน
+            </span>
+            <span>{taxId}</span>
+          </div>
 
-                            <div className='flex p-2 justify-between'>
-                                <div>
-                                    <label className='text-lg'>โครงการ</label>
-                                </div>
+          <div className="flex justify-between py-3">
+            <span className="text-gray-500">โครงการ</span>
+            <span className="text-right max-w-[70%]">
+              {project.acf.project_name}
+            </span>
+          </div>
 
-                                <div>
-                                    <label className='text-lg'>{project.acf.project_name}</label>
-                                </div>
-                            </div>
+          <div className="flex justify-between py-3">
+            <span className="text-gray-500">องค์กร</span>
+            <span>มหาวิทยาลัยบูรพา</span>
+          </div>
 
-                            <div className='flex p-2 justify-between border-b border-gray-300'>
-                                <div>
-                                    <label className='text-lg'>องค์กร</label>
-                                </div>
+        </div>
 
-                                <div>
-                                    <label className='text-lg'>มหาวิทยาลัยบูรพา</label>
-                                </div>
-                            </div>
+        {/* ===== AMOUNT ===== */}
+        <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl flex justify-between items-center">
+          <span className="text-gray-700 font-medium">
+            จำนวนเงินที่บริจาค
+          </span>
+          <span className="text-2xl font-bold text-green-600">
+            {donateAmount} บาท
+          </span>
+        </div>
 
-                            <div className='p-2 mb-4'>
-                                <h2 className='text-xl font-bold'>แนบหลักฐานการโอนเงิน <span className='text-red-500 font-bold'>*</span></h2>
-                            </div>
-                            
-                            <div>
-                                <input
-                                    type="file"
-                                    className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                                    onChange={(e) => setDonationReceipt(e.target.files ? e.target.files[0] : null)}
-                                    required
-                                />
-                            </div>
-                        </div>
-                    </div>
+        {/* ===== UPLOAD ===== */}
+        <div className="mt-6">
+          <label className="block font-semibold mb-2">
+            แนบหลักฐานการโอนเงิน <span className="text-red-500">*</span>
+          </label>
 
-                    <div className="mt-6">
-                        <button
-                            disabled={!donationReceipt}
-                            onClick={handleSubmitDonation}
-                            className={`w-full py-4 rounded-xl font-bold text-lg transition-all
-                                ${donationReceipt 
-                                    ? "bg-indigo-800 text-white hover:bg-indigo-900 shadow-lg cursor-pointer"
-                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
-                        >
-                            ยืนยันการบริจาค
-                        </button>
-                    </div>
-                </div>
-            )}
+          <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 hover:border-indigo-400 transition">
+            <input
+              type="file"
+              className="w-full text-sm text-gray-500
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-full file:border-0
+              file:text-sm file:font-semibold
+              file:bg-indigo-50 file:text-indigo-700
+              hover:file:bg-indigo-100"
+              onChange={(e) =>
+                setDonationReceipt(
+                  e.target.files ? e.target.files[0] : null
+                )
+              }
+              required
+            />
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    {/* ================= BUTTON ================= */}
+    <div className="mt-6">
+      <button
+        disabled={!donationReceipt}
+        onClick={handleSubmitDonation}
+        className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-200
+        ${
+          donationReceipt
+            ? "bg-gradient-to-r from-indigo-700 to-indigo-900 text-white hover:scale-[1.01] shadow-lg"
+            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+        }`}
+      >
+        ยืนยันการบริจาค
+      </button>
+    </div>
+  </div>
+)}
 
             {step === 4 && (
                 <div className="flex flex-col items-center justify-center p-10 bg-white rounded-xl">

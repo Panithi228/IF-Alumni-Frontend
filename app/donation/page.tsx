@@ -229,8 +229,8 @@ export default function Donation() {
                         {project.acf.tax_deduction > 1 && (
                           <div className="absolute top-0 right-0 w-36 h-36 overflow-hidden pointer-events-none z-10">
                               <div className="bg-red-700 text-white text-[14px] font-extrabold py-1.5 w-[160%] absolute top-[12px] -right-[68px] rotate-40 shadow-lg flex flex-col items-center justify-center uppercase tracking-tighter border-y border-white/20">
-                                  <span className="leading-tight">ลดหย่อนภาษี</span>
-                                  <span className="text-[16px] -mt-0.5">{project.acf.tax_deduction} เท่า</span>
+                                  <span className="leading-tight">ลดหย่อน</span>
+                                  <span className="text-[16px] -mt-0.5">X{project.acf.tax_deduction}</span>
                               </div>
                           </div>
                         )}
