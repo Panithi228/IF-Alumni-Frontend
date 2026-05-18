@@ -5,5 +5,5 @@ services:
     build:
       context: .
     ports:
-      - "8042:3000"
+      - "8045:3000"
     restart: unless-stopped
